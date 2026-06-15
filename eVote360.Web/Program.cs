@@ -1,7 +1,9 @@
 using eVote360.Core.Application;
+using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Infrastructure.Persistence;
-using eVote360.Infrastructure.Shared;
+using eVote360.Infrastructure.Persistence.Repositories;
 using eVote360.Infrastructure.Persistence.Seeders;
+using eVote360.Infrastructure.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
 builder.Services.AddSharedInfrastructure();
+builder.Services.AddScoped<IEleccionRepository, EleccionRepository>();
+builder.Services.AddScoped<ICandidatoRepository, CandidatoRepository>();
+builder.Services.AddScoped<IAlianzaRepository, AlianzaRepository>();
+builder.Services.AddScoped<ICandidatoPuestoRepository, CandidatoPuestoRepository>();
+builder.Services.AddScoped<IPartidoPoliticoRepository, PartidoPoliticoRepository>();
 
 var app = builder.Build();
 

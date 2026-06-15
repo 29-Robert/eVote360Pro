@@ -9,5 +9,10 @@ namespace eVote360.Core.Domain.Entities
         public string Siglas { get; set; } = null!;
         public string LogoUrl { get; set; } = null!;
         public bool Estado { get; set; } = true;
+
+        public ICollection<SolicitudAlianza> SolicitudesEnviadas { get; set; }
+        public ICollection<SolicitudAlianza> SolicitudesRecibidas { get; set; }
+        public ICollection<CandidatoPuesto> CandidatosPuestos { get; set; }
+        public ICollection<Candidato> Candidatos { get; set; }
     }
 }

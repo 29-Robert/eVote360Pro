@@ -11,5 +11,8 @@ namespace eVote360.Core.Domain.Entities
         public PartidoPolitico PartidoPolitico { get; set; } = null!;
         public int? PuestoElectivoId { get; set; }
         public PuestoElectivo? PuestoElectivo { get; set; }
+        public bool EsActivo { get; set; }
+
+        public ICollection<CandidatoPuesto> CandidatosPuestos { get; set; }
     }
 }
