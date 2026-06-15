@@ -1,6 +1,7 @@
 ﻿using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
+using eVote360.Core.Domain.Enums;
 
 namespace eVote360.Core.Application.Services
 {
@@ -16,7 +17,8 @@ namespace eVote360.Core.Application.Services
         public async Task<bool> HasEleccionActivaAsync()
         {
             var elecciones = await _repository.GetAllAsync();
-            return elecciones.Any(e => e.Estado == "Activa");
+
+            return elecciones.Any(e => e.Estado == EstadoEleccion.Activa);
         }
     }
 }

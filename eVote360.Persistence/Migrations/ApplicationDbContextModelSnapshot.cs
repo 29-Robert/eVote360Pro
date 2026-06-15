@@ -85,6 +85,38 @@ namespace eVote360.Infrastructure.Persistence.Migrations
                     b.ToTable("Ciudadanos");
                 });
 
+            modelBuilder.Entity("eVote360.Core.Domain.Entities.CodigoVerificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CiudadanoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EleccionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaExpiracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaGeneracion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Usado")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CodigosVerificacion");
+                });
+
             modelBuilder.Entity("eVote360.Core.Domain.Entities.Eleccion", b =>
                 {
                     b.Property<int>("Id")
@@ -93,9 +125,8 @@ namespace eVote360.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaRealizacion")
                         .HasColumnType("datetime2");

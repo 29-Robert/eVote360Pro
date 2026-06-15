@@ -1,4 +1,5 @@
 ﻿using eVote360.Core.Domain.Common;
+using eVote360.Core.Domain.Enums;
 
 namespace eVote360.Core.Domain.Entities
 {
@@ -6,6 +7,6 @@ namespace eVote360.Core.Domain.Entities
     {
         public string Nombre { get; set; } = null!;
         public DateTime FechaRealizacion { get; set; }
-        public string Estado { get; set; } = "Pendiente";
+        public EstadoEleccion Estado { get; set; } = EstadoEleccion.Pendiente;
     }
 }

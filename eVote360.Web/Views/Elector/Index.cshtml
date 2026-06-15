@@ -1,0 +1,53 @@
+﻿@model eVote360.Core.Application.DTOs.Ciudadanos.ElectorLoginDto
+
+@{
+    Layout = "_Layout"; 
+    ViewData["Title"] = "Ingreso de Elector";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-4 rounded-top-3">
+                    <h3 class="mb-1 fw-bold">eVote360 Pro</h3>
+                    <p class="mb-0 small text-light">Sistema Integrado de Votación Democrática</p>
+                </div>
+                <div class="card-body p-4">
+
+                    @* Resumen de errores de negocio (si la cédula no existe, está inactiva, o no hay elección activa) *@
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+                    }
+
+                    <form asp-controller="Elector" asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label asp-for="DocumentoIdentidad" class="form-label fw-semibold text-secondary"></label>
+                            <input asp-for="DocumentoIdentidad" class="form-control form-control-lg border-2 rounded-3 text-center fs-4" placeholder="000-0000000-0" autocomplete="off" autofocus />
+                            <span asp-validation-for="DocumentoIdentidad" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm py-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Verificar Identidad e Iniciar Votación
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="card-footer bg-light text-center py-3 rounded-bottom-3 border-top-0">
+                    <span class="text-muted small">Asegúrese de tener acceso a su correo electrónico registrado.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

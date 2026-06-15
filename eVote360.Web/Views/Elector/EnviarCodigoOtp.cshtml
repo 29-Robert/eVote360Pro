@@ -1,0 +1,63 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Fase 3 - Verificación OTP";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-4 rounded-top-3">
+                    <h4 class="mb-1 fw-bold"><i class="bi bi-shield-check me-2"></i>Código de Seguridad</h4>
+                    <p class="mb-0 small text-white-50">Fase 3: Verificación de un solo uso (OTP)</p>
+                </div>
+                <div class="card-body p-4 text-center">
+
+                    <div class="alert alert-warning text-start small rounded-3" role="alert">
+                        <i class="bi bi-envelope-check-fill me-2"></i>
+                        Hemos enviado un código secreto de **6 dígitos** a su correo electrónico registrado. Revise su bandeja de entrada (o SPAM).
+                    </div>
+
+                    <form asp-controller="Elector" asp-action="VerificarOtp" method="post" class="mt-4">
+                        @Html.AntiForgeryToken()
+
+                        <!-- Enviamos el ID del ciudadano de forma oculta -->
+                        <input type="hidden" name="ciudadanoId" value="@ViewBag.CiudadanoId" />
+
+                        <div class="mb-4">
+                            <label for="codigoOtp" class="form-label fw-bold text-secondary text-uppercase tracking-wider small">Ingrese el código de 6 dígitos</label>
+                            <input type="text" id="codigoOtp" name="codigoOtp" class="form-control form-control-lg text-center fw-bold fs-3 rounded-3 tracking-widest shadow-sm"
+                                   placeholder="000000" maxlength="6" autocomplete="off" required />
+                            <div class="text-danger small mt-2">
+                                @Html.ValidationSummary(true, "")
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm py-2">
+                                <i class="bi bi-unlock-fill me-2"></i>Validar y Acceder a la Cabina
+                            </button>
+                            <a asp-controller="Elector" asp-action="Index" class="btn btn-link text-muted btn-sm mt-1">
+                                Cancelar proceso
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="card-footer bg-light text-center py-3 rounded-bottom-3 border-top-0">
+                    <span class="text-muted small"><i class="bi bi-clock-history me-1"></i>El código expirará automáticamente en 5 minutos.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-widest {
+        letter-spacing: 8px !important;
+    }
+
+    .tracking-wider {
+        letter-spacing: 1px !important;
+    }
+</style>

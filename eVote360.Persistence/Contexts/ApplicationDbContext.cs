@@ -13,6 +13,7 @@ namespace eVote360.Infrastructure.Persistence.Contexts
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<AsignacionDirigente> AsignacionesDirigentes { get; set; }
         public DbSet<Eleccion> Elecciones { get; set; }
+        public DbSet<CodigoVerificacion> CodigosVerificacion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
