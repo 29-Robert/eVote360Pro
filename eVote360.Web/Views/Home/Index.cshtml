@@ -1,8 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Resumen Electoral";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark m-0">Panel del Administrador</h2>
+            <p class="text-muted">Resumen general de los procesos electorales.</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body bg-light">
+            <form method="get" asp-action="Index" class="row align-items-end g-3">
+                <div class="col-md-4">
+                    <label for="anioElectoral" class="form-label fw-bold text-dark">Año electoral</label>
+                    <select id="anioElectoral" name="anio" class="form-select">
+                        <option value="">Seleccione un año...</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-search"></i> Obtener Resumen Electoral
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped m-0 align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-3 text-start">Nombre de la elección</th>
+                            <th>Fecha de realización</th>
+                            <th>Partidos participantes</th>
+                            <th>Candidatos participantes</th>
+                            <th class="pe-3">Ciudadanos que votaron</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="py-4 text-muted">
+                                <i class="bi bi-info-circle"></i> Seleccione un año para visualizar el resumen electoral.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

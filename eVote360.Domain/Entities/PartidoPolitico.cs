@@ -1,4 +1,5 @@
 ﻿using eVote360.Core.Domain.Common;
+using System.Collections.Generic;
 
 namespace eVote360.Core.Domain.Entities
 {
@@ -10,9 +11,9 @@ namespace eVote360.Core.Domain.Entities
         public string LogoUrl { get; set; } = null!;
         public bool Estado { get; set; } = true;
 
-        public ICollection<SolicitudAlianza> SolicitudesEnviadas { get; set; }
-        public ICollection<SolicitudAlianza> SolicitudesRecibidas { get; set; }
-        public ICollection<CandidatoPuesto> CandidatosPuestos { get; set; }
-        public ICollection<Candidato> Candidatos { get; set; }
+        public ICollection<SolicitudAlianza> SolicitudesEnviadas { get; set; } = new List<SolicitudAlianza>();
+        public ICollection<SolicitudAlianza> SolicitudesRecibidas { get; set; } = new List<SolicitudAlianza>();
+        public ICollection<CandidatoPuesto> CandidatosPuestos { get; set; } = new List<CandidatoPuesto>();
+        public ICollection<Candidato> Candidatos { get; set; } = new List<Candidato>();
     }
 }

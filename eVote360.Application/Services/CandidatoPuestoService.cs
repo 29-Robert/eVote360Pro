@@ -67,6 +67,7 @@ namespace eVote360.Core.Application.Services
         public async Task<IEnumerable<CandidatoPuestoDto>> GetByPartidoAsync(int partidoId)
         {
             var asignaciones = await _repo.GetByPartidoAsync(partidoId);
+
             return asignaciones.Select(cp => new CandidatoPuestoDto
             {
                 Id = cp.Id,
