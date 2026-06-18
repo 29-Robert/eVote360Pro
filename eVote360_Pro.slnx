@@ -7,10 +7,10 @@
     <Project Path="eVote360.Persistence/eVote360.Infrastructure.Persistence.csproj" Id="0a34eede-822d-4a47-b540-c1592af9e72d" />
     <Project Path="eVote360.Shared/eVote360.Infrastructure.Shared.csproj" Id="2bb1c7bf-565b-4f58-a9dd-d4a9f3360cec" />
   </Folder>
+  <Folder Name="/Integrantes/">
+    <File Path="Integrantes.txt" />
+  </Folder>
   <Folder Name="/Web/">
     <Project Path="eVote360.Web/eVote360.WebApp.csproj" Id="722b5bee-9e74-42fc-b1d7-89fbfce932e4" />
-  </Folder>
-  <Folder Name="/z.Integrantes/">
-    <File Path="Integrantes.txt" />
   </Folder>
 </Solution>

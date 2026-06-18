@@ -1,7 +1,10 @@
-﻿namespace eVote360.Core.Application.Interfaces.Services
+﻿using System.IO;
+using System.Threading.Tasks;
+
+namespace eVote360.Core.Application.Interfaces.Services
 {
     public interface IOcrService
     {
-        Task<string> ExtraerTextoDeImagenAsync(string imagePath);
+        Task<string> ExtraerTextoDeImagenAsync(Stream imagenStream);
     }
 }

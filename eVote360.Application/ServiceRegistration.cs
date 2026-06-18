@@ -14,6 +14,8 @@ namespace eVote360.Core.Application
             services.AddTransient<IUsuarioService, UsuarioService>();
             services.AddTransient<IAsignacionDirigenteService, AsignacionDirigenteService>();
             services.AddTransient<IEleccionValidationService, EleccionValidationService>();
+            services.AddTransient<IElectorService, ElectorService>();
+            services.AddTransient<IEleccionService, EleccionService>();
         }
     }
 }
