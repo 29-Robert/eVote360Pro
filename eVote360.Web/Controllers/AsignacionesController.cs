@@ -4,6 +4,9 @@ using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.Asignaciones;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eVote360.WebApp.Controllers
 {
@@ -27,7 +30,10 @@ namespace eVote360.WebApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
+            var claimPartido = User.FindFirst("PartidoId");
+            if (claimPartido == null) return RedirectToAction("Index", "Home");
+
+            var partidoId = int.Parse(claimPartido.Value);
             var asignaciones = await _asignacionService.GetByPartidoAsync(partidoId);
             return View(asignaciones);
         }
@@ -40,7 +46,10 @@ namespace eVote360.WebApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
+            var claimPartido = User.FindFirst("PartidoId");
+            if (claimPartido == null) return RedirectToAction("Index", "Home");
+
+            var partidoId = int.Parse(claimPartido.Value);
 
             var candidatos = await _asignacionService.GetCandidatosDisponiblesAsync(partidoId);
             var puestos = await _asignacionService.GetPuestosDisponiblesAsync(partidoId);
@@ -68,14 +77,14 @@ namespace eVote360.WebApp.Controllers
 
             try
             {
-                var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
-                var dto = new SaveCandidatodto
-                {
-                    CandidatoId = vm.CandidatoId,
-                    PuestoElectivoId = vm.PuestoElectivoId,
-                    PartidoPoliticoId = partidoId
-                };
+                var claimPartido = User.FindFirst("PartidoId");
+                if (claimPartido == null) return RedirectToAction("Index", "Home");
+
+                var partidoId = int.Parse(claimPartido.Value);
+
+                // Aquí llamamos al servicio directamente sin usar el DTO fantasma
                 await _asignacionService.AgregarAsync(vm.CandidatoId, vm.PuestoElectivoId, partidoId);
+
                 TempData["Exito"] = "Asignación agregada correctamente.";
                 return RedirectToAction("Index");
             }
@@ -97,7 +106,6 @@ namespace eVote360.WebApp.Controllers
         {
             try
             {
-                var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
                 await _asignacionService.EliminarAsync(id);
                 TempData["Exito"] = "Asignación eliminada correctamente.";
             }

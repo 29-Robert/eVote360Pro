@@ -1,0 +1,44 @@
+﻿@model eVote360.WebApp.ViewModels.AsignacionDirigentes.SaveAsignacionViewModel
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="m-0"><i class="bi bi-link-45deg"></i> Asignar Dirigente a Partido</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <form asp-action="Create" method="post">
+
+                        <div class="mb-3">
+                            <label asp-for="UsuarioId" class="form-label fw-bold">Dirigente Político</label>
+                            <select asp-for="UsuarioId" asp-items="ViewBag.Usuarios" class="form-select">
+                                <option value="">-- Seleccione un dirigente disponible --</option>
+                            </select>
+                            <span asp-validation-for="UsuarioId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PartidoPoliticoId" class="form-label fw-bold">Partido Político</label>
+                            <select asp-for="PartidoPoliticoId" asp-items="ViewBag.Partidos" class="form-select">
+                                <option value="">-- Seleccione un partido político disponible --</option>
+                            </select>
+                            <span asp-validation-for="PartidoPoliticoId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Crear Asignación</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
