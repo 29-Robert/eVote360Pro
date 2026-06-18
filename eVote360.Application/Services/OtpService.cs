@@ -23,7 +23,7 @@ namespace eVote360.Core.Application.Services
         public async Task EnviarOtpAsync(int ciudadanoId, int eleccionId, string correoDestino)
         {
             Random random = new Random();
-            string codigoGenerado = random.Next(100000,999999).ToString();
+            string codigoGenerado = random.Next(100000, 999999).ToString();
 
             var nuevoOtp = new CodigoVerificacion
             {
@@ -65,9 +65,10 @@ namespace eVote360.Core.Application.Services
 
             if (otpValido == null)
             {
-                return false; 
+                return false;
             }
 
+            // 🔒 Consumo del token para asegurar un solo uso
             otpValido.Usado = true;
             await _otpRepository.UpdateAsync(otpValido);
 

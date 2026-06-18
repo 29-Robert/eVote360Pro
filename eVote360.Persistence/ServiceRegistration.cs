@@ -1,4 +1,5 @@
 ﻿using eVote360.Core.Application.Interfaces.Repositories;
+using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Infrastructure.Persistence.Contexts;
 using eVote360.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;

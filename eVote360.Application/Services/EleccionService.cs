@@ -26,7 +26,7 @@ namespace eVote360.Core.Application.Services
 
         public async Task ActivarEleccionAsync(int id)
         {
-            // 1. Verificar si ya existe otra elección activa en el sistema
+            // 1. si ya existe otra elección activa en el sistema
             var elecciones = await _eleccionRepository.GetAllAsync();
             if (elecciones.Any(e => e.Estado == EstadoEleccion.Activa))
             {

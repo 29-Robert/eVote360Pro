@@ -9,7 +9,6 @@ namespace eVote360.Infrastructure.Shared
         public static void AddSharedInfrastructure(this IServiceCollection services)
         {
             services.AddTransient<IEmailService, EmailService>();
-            services.AddTransient<IOcrService, OcrService>();
         }
     }
 }

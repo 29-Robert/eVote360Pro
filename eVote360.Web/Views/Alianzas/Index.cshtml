@@ -1,0 +1,128 @@
+﻿@model eVote360.WebApp.ViewModels.Alianzas.AlianzasViewModel
+
+@{
+    ViewData["Title"] = "Pactos y Alianzas Políticas";
+}
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people-fill me-2 text-primary"></i>Panel de Alianzas Políticas</h2>
+        <a asp-action="CrearSolicitud" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Proponer Alianza
+        </a>
+    </div>
+
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Exito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- 1. SOLICITUDES PENDIENTES -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-warning bg-opacity-10 py-3">
+            <h6 class="mb-0 fw-bold text-warning-dark"><i class="bi bi-envelope-fill me-2"></i>Solicitudes Pendientes por Resolver</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase fs-7">
+                        <tr>
+                            <th class="ps-4">Partido Politico</th>
+                            <th>Fecha de Envío</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Pendientes == null || !Model.Pendientes.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted small">No hay solicitudes pendientes de respuesta.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var solicitud in Model.Pendientes)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">@solicitud.NombrePartidoSolicitante</span>
+                                        <span class="text-muted small">(@solicitud.SiglasPartidoSolicitante)</span>
+                                    </td>
+                                    <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-inline-flex gap-2">
+                                            <a asp-action="Aceptar" asp-route-id="@solicitud.Id" class="btn btn-sm btn-success rounded-3 px-3">
+                                                <i class="bi bi-check-lg"></i> Aceptar
+                                            </a>
+                                            <a asp-action="Rechazar" asp-route-id="@solicitud.Id" class="btn btn-sm btn-outline-danger rounded-3 px-3">
+                                                <i class="bi bi-x-lg"></i> Rechazar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. PACTOS VIGENTES / CONFIRMADOS -->
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-success bg-opacity-10 py-3">
+            <h6 class="mb-0 fw-bold text-success"><i class="bi bi-shield-check me-2"></i>Alianzas Vigentes Concretadas</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase fs-7">
+                        <tr>
+                            <th class="ps-4">Coalición Aliada</th>
+                            <th>Estado del Pacto</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Vigentes == null || !Model.Vigentes.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted small">El partido no se encuentra en ninguna coalición activa en este momento.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var alianza in Model.Vigentes)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        <i class="bi bi-bookmark-star-fill text-success me-2"></i>@alianza.NombrePartidoReceptor
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill">Vigente</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a asp-action="EliminarAlianza" asp-route-id="@alianza.Id" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-trash-fill me-1"></i>Romper Pacto
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

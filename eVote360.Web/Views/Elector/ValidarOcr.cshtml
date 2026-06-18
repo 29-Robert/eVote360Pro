@@ -1,4 +1,5 @@
-﻿@{
+﻿@model eVote360.WebApp.ViewModels.Elector.ValidarOcrViewModel
+@{
     Layout = "_Layout";
     ViewData["Title"] = "Fase 2 - Validación por OCR";
 }
@@ -9,7 +10,7 @@
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-header bg-dark text-white text-center py-4 rounded-top-3">
                     <h4 class="mb-1 fw-bold"><i class="bi bi-camera me-2"></i>Verificación de Identidad</h4>
-                    <p class="mb-0 small text-muted">Fase 2: Escaneo Facial y de Documento</p>
+                    <p class="mb-0 small text-muted">Fase 2: Escaneo de Documento de Identidad</p>
                 </div>
                 <div class="card-body p-4 text-center">
 
@@ -18,15 +19,22 @@
                         Para continuar con el proceso de votación, por favor suba una foto clara y legible del frente de su cédula de identidad.
                     </div>
 
-                    <!-- El formulario apunta a la acción del controlador que procesará la imagen -->
                     <form asp-controller="Elector" asp-action="ValidarOcr" method="post" enctype="multipart/form-data" class="mt-4">
                         @Html.AntiForgeryToken()
+
+                        <!-- 🛠️ CAMBIO 1: Preserva el número de cédula digitado entre las peticiones -->
+                        <input type="hidden" asp-for="DocumentoIdentidad" />
+
+                        <!-- 🛠️ CAMBIO 2: Zona para mostrar las alertas de error del documento de requerimientos -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger text-start small mb-3 fw-bold"></div>
 
                         <div class="mb-4">
                             <div class="border-2 border-dashed border-secondary rounded-3 p-5 bg-light position-relative custom-file-upload">
                                 <i class="bi bi-cloud-arrow-up display-4 text-secondary d-block mb-3"></i>
-                                <label for="fotoCedula" class="form-label fw-bold text-dark">Seleccione o arrastre la foto de su cédula</label>
-                                <input type="file" id="fotoCedula" name="fotoCedula" class="form-control mt-2" accept="image/*" required />
+                                <label asp-for="FotoCedula" class="form-label fw-bold text-dark">Seleccione o arrastre la foto de su cédula</label>
+                                <!-- Se especifica restrictivamente las extensiones permitidas por el PDF -->
+                                <input asp-for="FotoCedula" type="file" class="form-control mt-2" accept=".jpg,.jpeg,.png" />
+                                <span asp-validation-for="FotoCedula" class="text-danger small d-block mt-1 text-start"></span>
                             </div>
                         </div>
 
@@ -42,7 +50,7 @@
 
                 </div>
                 <div class="card-footer bg-light text-center py-3 rounded-bottom-3 border-top-0">
-                    <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Los datos escaneados se manejan de manera cifrada y confidencial.</span>
+                    <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i>Los datos escaneados se manejan de manera confidencial.</span>
                 </div>
             </div>
         </div>

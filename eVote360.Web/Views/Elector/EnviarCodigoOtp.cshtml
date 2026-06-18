@@ -18,6 +18,11 @@
                         Hemos enviado un código secreto de **6 dígitos** a su correo electrónico registrado. Revise su bandeja de entrada (o SPAM).
                     </div>
 
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small text-start my-3"></div>
+                    }
+
                     <form asp-controller="Elector" asp-action="VerificarOtp" method="post" class="mt-4">
                         @Html.AntiForgeryToken()
 
@@ -26,19 +31,27 @@
 
                         <div class="mb-4">
                             <label for="codigoOtp" class="form-label fw-bold text-secondary text-uppercase tracking-wider small">Ingrese el código de 6 dígitos</label>
-                            <input type="text" id="codigoOtp" name="codigoOtp" class="form-control form-control-lg text-center fw-bold fs-3 rounded-3 tracking-widest shadow-sm"
-                                   placeholder="000000" maxlength="6" autocomplete="off" required />
-                            <div class="text-danger small mt-2">
-                                @Html.ValidationSummary(true, "")
-                            </div>
+
+                            @* Input optimizado con padding-left para contrarrestar el letter-spacing del placeholder *@
+                            <input type="text"
+                                   id="codigoOtp"
+                                   name="codigoOtp"
+                                   class="form-control form-control-lg text-center fw-bold fs-3 rounded-3 tracking-widest shadow-sm text-success"
+                                   placeholder="000000"
+                                   maxlength="6"
+                                   autocomplete="off"
+                                   inputmode="numeric"
+                                   pattern="\d*"
+                                   autofocus
+                                   required />
                         </div>
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm py-2">
                                 <i class="bi bi-unlock-fill me-2"></i>Validar y Acceder a la Cabina
                             </button>
-                            <a asp-controller="Elector" asp-action="Index" class="btn btn-link text-muted btn-sm mt-1">
-                                Cancelar proceso
+                            <a asp-controller="Elector" asp-action="Index" class="btn btn-link text-muted btn-sm mt-1 text-decoration-none">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar proceso
                             </a>
                         </div>
                     </form>
@@ -55,6 +68,7 @@
 <style>
     .tracking-widest {
         letter-spacing: 8px !important;
+        padding-left: 14px; 
     }
 
     .tracking-wider {
