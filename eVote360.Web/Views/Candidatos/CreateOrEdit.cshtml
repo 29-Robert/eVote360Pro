@@ -1,0 +1,78 @@
+﻿@model eVote360.Core.Application.DTOs.Candidato.SaveCandidatoDto
+
+@{
+    bool isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Editar Candidato" : "Crear Candidato";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center">@ViewData["Title"]</h2>
+    <hr />
+
+    <form asp-action="CreateOrEdit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Foto" />
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nombre" class="form-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Apellido" class="form-label">Apellido</label>
+                <input asp-for="Apellido" class="form-control" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="DocumentoIdentidad" class="form-label">Cédula</label>
+                <input asp-for="DocumentoIdentidad" class="form-control" placeholder="000-0000000-0" />
+                <span asp-validation-for="DocumentoIdentidad" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="CorreoElectronico" class="form-label">Correo Electrónico</label>
+                <input asp-for="CorreoElectronico" class="form-control" type="email" />
+                <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Partido Político</label>
+                <select asp-for="PartidoPoliticoId" asp-items="ViewBag.Partidos" class="form-select">
+                    <option value="">-- Seleccione un Partido --</option>
+                </select>
+                <span asp-validation-for="PartidoPoliticoId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Puesto Electivo</label>
+                <select asp-for="PuestoElectivoId" asp-items="ViewBag.Puestos" class="form-select">
+                    <option value="">-- Seleccione un Puesto --</option>
+                </select>
+                <span asp-validation-for="PuestoElectivoId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Foto del Candidato</label>
+            <input type="file" name="file" class="form-control" accept="image/*" />
+            @if (isEdit && !string.IsNullOrEmpty(Model.Foto))
+            {
+                <div class="mt-2">
+                    <small class="text-muted">Foto actual:</small><br />
+                    <img src="@Model.Foto" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;" />
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Candidato</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
