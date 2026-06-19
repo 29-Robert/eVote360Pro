@@ -27,7 +27,7 @@ namespace eVote360.WebApp.Controllers
         {
             if (await _validationService.HasEleccionActivaAsync())
             {
-                TempData["ErrorMessage"] = "No se pueden crear puestos mientras haya una elección activa.";
+                TempData["ErrorMessage"] = "No se pueden modificar puestos electivos mientras exista una elección activa.";
                 return RedirectToAction(nameof(Index));
             }
             return View(new SavePuestoElectivoViewModel());
