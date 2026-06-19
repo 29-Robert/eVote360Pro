@@ -15,6 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Registro de Servicios del Framework
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 
 // 2. Registro de las Capas del Proyecto (Onion Architecture)
 builder.Services.AddApplicationLayer();
@@ -25,6 +34,10 @@ builder.Services.AddTransient<IOcrService, TesseractOcrService>();
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IOtpService, OtpService>();
+builder.Services.AddTransient<IHomeDirigenteService, HomeDirigenteService>();
+builder.Services.AddScoped<ICandidatoService, CandidatoService>();
+builder.Services.AddScoped<ICandidatoPuestoService, CandidatoPuestoService>();
+
 
 // 3. Registro de Repositorios Específicos
 builder.Services.AddScoped<IEleccionRepository, EleccionRepository>();
@@ -32,6 +45,8 @@ builder.Services.AddScoped<ICandidatoRepository, CandidatoRepository>();
 builder.Services.AddScoped<IAlianzaRepository, AlianzaRepository>();
 builder.Services.AddScoped<ICandidatoPuestoRepository, CandidatoPuestoRepository>();
 builder.Services.AddScoped<IPartidoPoliticoRepository, PartidoPoliticoRepository>();
+builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IPuestoElectivoRepository, PuestoElectivoRepository>();
 
 // 4. Servicio requerido por CandidatoPuestoService para Claims/Usuarios (¡Colocado correctamente aquí!)
 builder.Services.AddHttpContextAccessor();
@@ -46,6 +61,8 @@ using (var scope = app.Services.CreateScope())
     await DefaultAdminUser.SeedAsync(services);
 }
 
+
+
 // 7. Configuración del Pipeline de HTTP (Middlewares)
 if (!app.Environment.IsDevelopment())
 {
@@ -55,6 +72,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseSession();
 app.UseAuthorization();
 app.MapStaticAssets();
 

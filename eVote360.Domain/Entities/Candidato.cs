@@ -1,4 +1,5 @@
-﻿using eVote360.Core.Domain.Common;
+﻿
+using eVote360.Core.Domain.Common;
 
 namespace eVote360.Core.Domain.Entities
 {

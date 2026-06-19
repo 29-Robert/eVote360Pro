@@ -3,6 +3,9 @@
     <Project Path="eVote360.Application/eVote360.Core.Application.csproj" Id="c55941fd-cd2d-4535-bb4f-855ed729a81a" />
     <Project Path="eVote360.Domain/eVote360.Core.Domain.csproj" Id="a7c21c17-a147-49e5-8291-cb153b978dba" />
   </Folder>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="Directory.Build.props" />
+  </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="eVote360.Persistence/eVote360.Infrastructure.Persistence.csproj" Id="0a34eede-822d-4a47-b540-c1592af9e72d" />
     <Project Path="eVote360.Shared/eVote360.Infrastructure.Shared.csproj" Id="2bb1c7bf-565b-4f58-a9dd-d4a9f3360cec" />

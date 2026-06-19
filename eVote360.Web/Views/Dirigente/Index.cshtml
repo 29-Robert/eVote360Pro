@@ -1,0 +1,130 @@
+﻿@model eVote360.WebApp.ViewModels.HomeDirigente.HomeDirigenteViewModel
+@{
+    ViewData["Title"] = "Panel del Dirigente";
+}
+
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
+            <h4 class="m-0">
+                <i class="bi bi-speedometer2 me-2"></i> Panel del Dirigente Político
+            </h4>
+            @if (Model.PartidoActivo)
+            {
+                <span class="badge bg-success fs-6">
+                    <i class="bi bi-circle-fill me-1" style="font-size:.55rem"></i> Partido activo
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-danger fs-6">
+                    <i class="bi bi-circle-fill me-1" style="font-size:.55rem"></i> Partido inactivo
+                </span>
+            }
+        </div>
+        <div class="card-body bg-light">
+            <p class="text-muted mb-0">
+                Bienvenido, <strong>@Model.NombreCompleto</strong>.
+                Estás gestionando el partido
+                <strong>@Model.NombrePartido</strong> (@Model.SiglasPartido).
+            </p>
+        </div>
+    </div>
+
+    
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body bg-light">
+                    <div class="fs-2 fw-bold text-primary">@Model.TotalCandidatos</div>
+                    <div class="text-muted small">Candidatos registrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body bg-light">
+                    <div class="fs-2 fw-bold text-success">@Model.CandidatosActivos</div>
+                    <div class="text-muted small">Candidatos activos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body bg-light">
+                    <div class="fs-2 fw-bold text-warning">@Model.AlianzasPendientes</div>
+                    <div class="text-muted small">Alianzas pendientes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body bg-light">
+                    <div class="fs-2 fw-bold text-info">@Model.CandidatosAsignados</div>
+                    <div class="text-muted small">Candidatos asignados</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="m-0"><i class="bi bi-person-badge me-2"></i> Candidatos</h5>
+                </div>
+                <div class="card-body bg-light d-flex flex-column">
+                    <p class="text-muted flex-grow-1">
+                        Registra, edita, activa o desactiva los candidatos de tu partido
+                        para participar en la elección activa.
+                    </p>
+                    <a asp-controller="Candidatos" asp-action="Index"
+                       class="btn btn-primary w-100">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Gestionar Candidatos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="m-0"><i class="bi bi-diagram-3 me-2"></i> Alianzas Políticas</h5>
+                </div>
+                <div class="card-body bg-light d-flex flex-column">
+                    <p class="text-muted flex-grow-1">
+                        Solicita alianzas con otros partidos o responde las solicitudes
+                        recibidas para compartir candidatos en puestos electivos.
+                    </p>
+                    <a asp-controller="Alianzas" asp-action="Index"
+                       class="btn btn-primary w-100">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Gestionar Alianzas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="m-0"><i class="bi bi-arrow-left-right me-2"></i> Asignar Candidato a Puesto</h5>
+                </div>
+                <div class="card-body bg-light d-flex flex-column">
+                    <p class="text-muted flex-grow-1">
+                        Asigna tus candidatos o los de alianzas aceptadas a los
+                        puestos electivos disponibles en la elección activa.
+                    </p>
+                    <a asp-controller="Asignaciones" asp-action="Index"
+                       class="btn btn-primary w-100">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Gestionar Asignaciones
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
