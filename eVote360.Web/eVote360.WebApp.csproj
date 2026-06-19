@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
@@ -15,21 +12,17 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
-		
-		<PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.3" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.2" />
 		<PackageReference Include="Tesseract" Version="5.2.0" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\eVote360.Application\eVote360.Core.Application.csproj" />
 		<ProjectReference Include="..\eVote360.Persistence\eVote360.Infrastructure.Persistence.csproj" />
 		<ProjectReference Include="..\eVote360.Shared\eVote360.Infrastructure.Shared.csproj" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<None Update="tessdata\spa.traineddata">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
 </Project>
