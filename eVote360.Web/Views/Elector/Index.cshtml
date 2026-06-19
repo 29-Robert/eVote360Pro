@@ -15,7 +15,6 @@
                 </div>
                 <div class="card-body p-4">
 
-                    @* Resumen de errores de negocio *@
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
@@ -27,7 +26,6 @@
                         <div class="mb-4">
                             <label asp-for="DocumentoIdentidad" class="form-label fw-semibold text-secondary">Cédula de Identidad (Solo Números)</label>
 
-                            @* 🧼 Optimizado para no permitir guiones en la interfaz y limitar a 11 dígitos *@
                             <input asp-for="DocumentoIdentidad"
                                    class="form-control form-control-lg border-2 rounded-3 text-center fs-4 fw-bold text-primary"
                                    placeholder="00112345678"
@@ -36,13 +34,13 @@
                                    inputmode="numeric"
                                    autocomplete="off"
                                    autofocus
-                                   required />
+                                   required
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
 
                             <span asp-validation-for="DocumentoIdentidad" class="text-danger small mt-1 d-block"></span>
                         </div>
 
                         <div class="d-grid gap-2">
-                            @* 🎯 Botón Acceder unificado y estilizado *@
                             <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm py-2">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Acceder y Verificar Identidad
                             </button>
