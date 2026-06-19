@@ -1,5 +1,10 @@
 ﻿@model eVote360.WebApp.ViewModels.PartidosPoliticos.SavePartidoPoliticoViewModel
 
+@{
+    bool isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Editar Partido" : "Crear Partido";
+}
+
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -35,12 +40,16 @@
                                 <div class="form-text">Formatos permitidos: JPG, PNG, WEBP.</div>
                                 <span asp-validation-for="LogoFile" class="text-danger small"></span>
                             </div>
+            }
                         </div>
 
                         <div class="mt-4 d-flex justify-content-end gap-2">
                             <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> Guardar Partido</button>
                         </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
                     </form>
                 </div>
             </div>

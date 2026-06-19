@@ -1,0 +1,66 @@
+﻿@model IEnumerable<eVote360.Core.Application.DTOs.Candidato.CandidatoDTO>
+
+@{
+    ViewData["Title"] = "Gestión de Candidatos";
+}
+
+<div class="container-fluid">
+    <h2 class="text-center my-4">Gestión de Candidatos</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="mb-3">
+        <a asp-action="CreateOrEdit" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Crear Nuevo Candidato
+        </a>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Partido</th>
+                <th>Puesto</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.Foto" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
+                    </td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Apellido</td>
+                    <td>@item.NombrePartido</td>
+                    <td>@item.PuestoAsignado</td>
+                    <td>
+                        <span class="badge @(item.EsActivo ? "bg-success" : "bg-danger")">
+                            @(item.EsActivo ? "Activo" : "Inactivo")
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-action="CreateOrEdit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form asp-action="ChangeState" asp-route-id="@item.Id" asp-route-estado="@(!item.EsActivo)" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm @(item.EsActivo ? "btn-danger" : "btn-success")">
+                                @(item.EsActivo ? "Desactivar" : "Activar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

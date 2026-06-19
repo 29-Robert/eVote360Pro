@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using eVote360.Core.Domain.Entities;
 
 
 
@@ -34,11 +33,11 @@ namespace eVote360.Infrastructure.Persistence.Repositories
 
         public async Task<CandidatoPuesto> GetByIdAsync(int id)
         {
-            return await _context.CandidatosPuestos
+            return (await _context.CandidatosPuestos
                 .Include(cp => cp.Candidato)
                 .Include(cp => cp.PuestoElectivo)
                 .Include(cp => cp.PartidoPolitico)
-                .FirstOrDefaultAsync(cp => cp.Id == id);
+                .FirstOrDefaultAsync(cp => cp.Id == id))!;
         }
 
         public async Task<IEnumerable<CandidatoPuestoDto>> GetCandidatosDisponiblesAsync(int partidoId)
@@ -116,5 +115,9 @@ namespace eVote360.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public Task<IEnumerable<CandidatoPuesto>> GetAllAsync()
+        {
+            throw new NotImplementedException();//
+        }
     }
 }

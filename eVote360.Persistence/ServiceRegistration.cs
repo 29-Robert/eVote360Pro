@@ -1,5 +1,4 @@
 ﻿using eVote360.Core.Application.Interfaces.Repositories;
-using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Infrastructure.Persistence.Contexts;
 using eVote360.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +17,11 @@ namespace eVote360.Infrastructure.Persistence
                     m => m.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            services.AddTransient<IVotoRepository, VotoRepository>();
+            services.AddTransient<IPuestoElectivoRepository, PuestoElectivoRepository>();
+            services.AddTransient<ICandidatoPuestoRepository, CandidatoPuestoRepository>(); 
+            services.AddTransient<IAlianzaRepository, AlianzaRepository>(); 
         }
     }
 }

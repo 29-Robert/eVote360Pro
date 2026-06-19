@@ -34,6 +34,7 @@ namespace eVote360.WebApp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SavePuestoElectivoViewModel vm)
         {
             if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
@@ -64,6 +65,7 @@ namespace eVote360.WebApp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(SavePuestoElectivoViewModel vm)
         {
             if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
