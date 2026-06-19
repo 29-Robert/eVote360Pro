@@ -1,8 +1,6 @@
 ﻿using eVote360.Core.Domain.Common;
 using eVote360.Core.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eVote360.Core.Domain.Entities
 {

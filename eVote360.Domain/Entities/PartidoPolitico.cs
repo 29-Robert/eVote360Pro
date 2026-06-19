@@ -1,4 +1,5 @@
 ﻿using eVote360.Core.Domain.Common;
+using System.Collections.Generic;
 
 namespace eVote360.Core.Domain.Entities
 {

@@ -8,28 +8,28 @@ namespace eVote360.WebApp.Controllers
     public class PuestosElectivosController : Controller
     {
         private readonly IPuestoElectivoService _puestoService;
+        private readonly IEleccionValidationService _validationService;
 
-        public PuestosElectivosController(IPuestoElectivoService puestoService)
+        public PuestosElectivosController(IPuestoElectivoService puestoService, IEleccionValidationService validationService)
         {
             _puestoService = puestoService;
+            _validationService = validationService;
         }
 
         public async Task<IActionResult> Index()
         {
             var dtos = await _puestoService.GetAllAsync();
-            var viewModels = dtos.Select(d => new PuestoElectivoViewModel
-            {
-                Id = d.Id,
-                Nombre = d.Nombre,
-                Descripcion = d.Descripcion,
-                Estado = d.Estado
-            }).ToList();
-
-            return View(viewModels);
+            ViewBag.IsEleccionActiva = await _validationService.HasEleccionActivaAsync();
+            return View(dtos);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            if (await _validationService.HasEleccionActivaAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden crear puestos mientras haya una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
             return View(new SavePuestoElectivoViewModel());
         }
 
@@ -37,6 +37,7 @@ namespace eVote360.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SavePuestoElectivoViewModel vm)
         {
+            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
             if (!ModelState.IsValid) return View(vm);
 
             try
@@ -45,25 +46,29 @@ namespace eVote360.WebApp.Controllers
                 await _puestoService.AddAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError("", ex.Message);
                 return View(vm);
             }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
+            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+
             var dto = await _puestoService.GetByIdSaveDtoAsync(id);
             if (dto == null) return NotFound();
 
-            return View(new SavePuestoElectivoViewModel { Id = dto.Id, Nombre = dto.Nombre, Descripcion = dto.Descripcion });
+            var vm = new SavePuestoElectivoViewModel { Id = dto.Id, Nombre = dto.Nombre, Descripcion = dto.Descripcion };
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(SavePuestoElectivoViewModel vm)
         {
+            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
             if (!ModelState.IsValid) return View(vm);
 
             try
@@ -72,25 +77,19 @@ namespace eVote360.WebApp.Controllers
                 await _puestoService.UpdateAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError("", ex.Message);
                 return View(vm);
             }
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeState(int id)
+        public async Task<IActionResult> ChangeState(int id, bool state)
         {
-            try
-            {
-                await _puestoService.ChangeStateAsync(id);
-            }
-            catch (InvalidOperationException ex)
-            {
-                TempData["Error"] = ex.Message;
-            }
+            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+
+            await _puestoService.ChangeStateAsync(id, state);
             return RedirectToAction(nameof(Index));
         }
     }
