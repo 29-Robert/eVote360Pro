@@ -1,9 +1,8 @@
-﻿using eVote360.Core.Application.Interfaces.Services;
+﻿using eVote360.Core.Application.DTOs.Votaciones;
+using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
 using eVote360.Core.Domain.Enums;
-using eVote360.Infrastructure.Persistence.Contexts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -12,12 +11,11 @@ namespace eVote360.WebApp.Controllers
     public class EleccionesController : Controller
     {
         private readonly IEleccionService _eleccionService;
-        private readonly ApplicationDbContext _context; 
 
-        public EleccionesController(IEleccionService eleccionService, ApplicationDbContext context)
+        // 🛠️ Corrección: Eliminamos la inyección directa del DbContext para respetar Onion Architecture
+        public EleccionesController(IEleccionService eleccionService)
         {
             _eleccionService = eleccionService;
-            _context = context;
         }
 
         [HttpGet]
@@ -25,8 +23,8 @@ namespace eVote360.WebApp.Controllers
         {
             try
             {
-                // Consultamos directamente la tabla de elecciones en la base de datos SQL Server
-                var elecciones = await _context.Elecciones.ToListAsync();
+                // 🛠️ Usamos el servicio de aplicación en lugar de consultar la BD directamente
+                var elecciones = await _eleccionService.GetAllAsync();
                 return View(elecciones);
             }
             catch (Exception ex)
@@ -36,31 +34,25 @@ namespace eVote360.WebApp.Controllers
             }
         }
 
-        // 2. Formulario de Creación (Vista)
         [HttpGet]
         public IActionResult Crear()
         {
-            return View(new Eleccion { FechaRealizacion = DateTime.Today });
+            return View(new SaveEleccionDto { FechaRealizacion = DateTime.Today });
         }
 
-        // 3. Procesar la Creación de la Elección
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Crear(Eleccion eleccion)
+        public async Task<IActionResult> Crear(SaveEleccionDto dto)
         {
             if (!ModelState.IsValid)
             {
-                return View(eleccion);
+                return View(dto);
             }
 
             try
             {
-                // Forzamos el estado inicial en Pendiente por requerimiento
-                eleccion.Estado = EstadoEleccion.Pendiente;
-
-                // Guardamos directamente en la tabla a través de EF Core 10
-                await _context.Elecciones.AddAsync(eleccion);
-                await _context.SaveChangesAsync();
+                // 🛠️ Delegamos la creación al servicio de negocio
+                await _eleccionService.CrearEleccionAsync(dto);
 
                 TempData["SuccessMessage"] = "¡El proceso electoral ha sido registrado exitosamente en estado Pendiente!";
                 return RedirectToAction(nameof(Index));
@@ -68,13 +60,12 @@ namespace eVote360.WebApp.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"No se pudo crear la elección: {ex.Message}";
-                return View(eleccion);
+                return View(dto);
             }
         }
 
-        // 4. Transición de Estados usando tu IEleccionService original
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> CambiarEstado(int id, EstadoEleccion nuevoEstado)
         {
             try

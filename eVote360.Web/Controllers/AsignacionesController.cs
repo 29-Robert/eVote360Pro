@@ -59,14 +59,14 @@ namespace eVote360.WebApp.Controllers
                 Text = p.Nombre
             });
 
-            return View(vm);
+            return View("Create", vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Agregar(AgregarAsignacionesViewModel vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid) return View("Create", vm);
 
             try
             {
@@ -83,7 +83,7 @@ namespace eVote360.WebApp.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
-                return View(vm);
+                return View("Create", vm);
             }
         }
     }
