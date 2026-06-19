@@ -1,0 +1,55 @@
+﻿@model IEnumerable<eVote360.Core.Application.DTOs.PuestosElectivos.PuestoElectivoDto>
+
+@{
+    ViewData["Title"] = "Mantenimiento de Puestos";
+}
+
+<div class="container-fluid">
+    <h2 class="text-center my-4">Mantenimiento de Puestos Electivos</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="mb-3">
+        <a asp-controller="PuestoElectivo" asp-action="Create" class="btn btn-primary">Crear Nuevo Puesto</a>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Descripcion</td>
+                    <td>
+                        <span class="badge @(item.Estado ? "bg-success" : "bg-danger")">
+                            @(item.Estado ? "Activo" : "Inactivo")
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-controller="PuestoElectivo" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form asp-controller="PuestoElectivo" asp-action="ChangeState" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm @(item.Estado ? "btn-danger" : "btn-success")">
+                                @(item.Estado ? "Desactivar" : "Activar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -22,8 +22,4 @@
 		<ProjectReference Include="..\eVote360.Application\eVote360.Core.Application.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Service\" />
-	</ItemGroup>
-
 </Project>

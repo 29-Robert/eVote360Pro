@@ -1,0 +1,51 @@
+﻿@model eVote360.Core.Application.DTOs.PartidosPoliticos.SavePartidoPoliticoDto
+
+@{
+    bool isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Editar Partido" : "Crear Partido";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center">@ViewData["Title"]</h2>
+    <hr />
+
+    <!-- AÑADIDO: enctype="multipart/form-data" para permitir la subida de archivos -->
+    <form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
+        <!-- AÑADIDO: Campo oculto para mantener la URL existente en edición -->
+        <input type="hidden" asp-for="LogoUrl" />
+
+        <div class="mb-3">
+            <label asp-for="Nombre" class="form-label">Nombre del Partido</label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Siglas" class="form-label">Siglas</label>
+            <input asp-for="Siglas" class="form-control" />
+            <span asp-validation-for="Siglas" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Logo del Partido</label>
+            <input type="file" name="file" class="form-control" accept="image/*" />
+            @if (isEdit && !string.IsNullOrEmpty(Model.LogoUrl))
+            {
+                <div class="mt-2">
+                    <small class="text-muted">Logo actual:</small><br />
+                    <img src="@Model.LogoUrl" style="width: 100px;" />
+                </div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Descripcion" class="form-label">Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

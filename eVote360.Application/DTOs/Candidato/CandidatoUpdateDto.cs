@@ -10,21 +10,22 @@ namespace eVote360.Core.Application.DTOs.Candidato
     public class CandidatoUpdateDto : CandidatoDTO
     {
         [Required]
-        public int Id { get; set; }
+        public new int Id { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public new string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El apellido es obligatorio")]
+        public new string Apellido { get; set; } = string.Empty;
+
+        // Si la foto es obligatoria por validación, no debería ser string?
+        [Required(ErrorMessage = "La foto es obligatoria")]
+        public new string Foto { get; set; } = string.Empty;
 
         [Required]
-        public string Nombre { get; set; }
+        public new bool EsActivo { get; set; }
 
-        [Required]
-        public string Apellido { get; set; }
-
-        [Required]
-        public string? Foto { get; set; } 
-
-        [Required]
-        public bool EsActivo { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Debe seleccionar un partido")]
         public int PartidoPoliticoId { get; set; }
     }
 }

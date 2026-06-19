@@ -1,4 +1,5 @@
 ﻿@model eVote360.WebApp.ViewModels.Elector.CabinaVotacionViewModel
+
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Cabina de Votación Virtual";
@@ -8,40 +9,34 @@
     <div class="text-center mb-5">
         <span class="badge bg-danger text-uppercase px-3 py-2 mb-2 tracking-wider fw-bold">Cabina Virtual Activa</span>
         <h2 class="fw-black text-dark">@Model.NombreEleccion</h2>
-        <p class="text-muted lead">Seleccione el candidato de su preferencia presionando el botón de su recuadro político.</p>
     </div>
 
     @foreach (var partido in Model.Partidos)
     {
-        <div class="card shadow-sm border-0 mb-5 rounded-3 overflow-hidden">
-            <div class="card-header bg-light d-flex align-items-center justify-content-between p-4 border-bottom">
-                <div class="d-flex align-items-center">
-                    <img src="@partido.LogoUrl" alt="Logo" class="rounded-circle border me-3 object-fit-cover shadow-sm" style="width: 55px; height: 55px;" />
-                    <div>
-                        <h4 class="mb-0 fw-bold text-dark">@partido.NombrePartido</h4>
-                        <span class="text-primary fw-bold tracking-widest small">FRENTE ELECTORAL: @partido.Siglas</span>
-                    </div>
-                </div>
+        <!-- Aquí al usar @partido.PartidoId, la referencia subirá a 1 -->
+        <div class="card shadow-sm border-0 mb-5 rounded-3 overflow-hidden" data-partido-id="@partido.PartidoId">
+            <div class="card-header bg-light p-4 border-bottom">
+                <h4 class="mb-0 fw-bold text-dark">@partido.NombrePartido (@partido.Siglas)</h4>
             </div>
 
-            <div class="card-body p-4 bg-light bg-opacity-25">
-                <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+            <div class="card-body p-4">
+                <div class="row g-4 justify-content-center">
                     @foreach (var candidato in partido.Candidatos)
                     {
-                        <div class="col">
-                            <div class="card h-100 border border-2 border-transparent hover-shadow transition-all rounded-3 bg-white text-center p-3 position-relative">
-                                <img src="@candidato.Foto" alt="Foto Candidato" class="card-img-top rounded-3 object-fit-cover shadow-sm mx-auto mt-2 mb-3" style="width: 140px; height: 140px;" />
-                                <div class="card-body p-1">
-                                    <h5 class="card-title fw-bold text-dark mb-1">@candidato.Nombre @candidato.Apellido</h5>
-                                    <p class="card-text text-muted small mb-4">Candidato Presidencial</p>
+                        <div class="col-md-4">
+                            <div class="card h-100 text-center p-3">
+                                <img src="@candidato.Foto" class="card-img-top mx-auto" style="width: 100px; height: 100px;" />
+                                <div class="card-body">
+                                    <h5 class="fw-bold">@candidato.Nombre @candidato.Apellido</h5>
 
                                     <form asp-controller="Elector" asp-action="RegistrarVoto" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="candidatoId" value="@candidato.Id" />
+                                        <input type="hidden" name="puestoId" value="@candidato.PuestoElectivoId" />
                                         <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
 
-                                        <button type="submit" class="btn btn-outline-dark w-100 fw-bold py-2 rounded-3 hover-invert">
-                                            Votar por este candidato
+                                        <button type="submit" class="btn btn-outline-dark w-100">
+                                            Votar
                                         </button>
                                     </form>
                                 </div>
@@ -52,21 +47,11 @@
             </div>
         </div>
     }
+
+    <div class="text-center mt-5">
+        <form asp-controller="Elector" asp-action="FinalizarVotacion" method="post">
+            <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
+            <button type="submit" class="btn btn-success btn-lg px-5">Finalizar votación</button>
+        </form>
+    </div>
 </div>
-
-<style>
-    .hover-shadow:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.125) !important;
-        border-color: #212529 !important;
-    }
-
-    .transition-all {
-        transition: all 0.25s ease-in-out;
-    }
-
-    .hover-invert:hover {
-        background-color: #212529;
-        color: #fff;
-    }
-</style>

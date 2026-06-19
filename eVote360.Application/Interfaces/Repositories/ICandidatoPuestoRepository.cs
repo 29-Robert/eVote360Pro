@@ -1,14 +1,13 @@
 ﻿using eVote360.Core.Application.DTOs.Candidato;
 using eVote360.Core.Application.DTOs.PuestosElectivos;
 using eVote360.Core.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eVote360.Core.Application.Interfaces.Repositories
 {
     public interface ICandidatoPuestoRepository
     {
+        Task<IEnumerable<CandidatoPuesto>> GetAllAsync();
+
         Task<IEnumerable<CandidatoPuesto>> GetByPartidoAsync(int partidoId);
         Task<CandidatoPuesto> GetByIdAsync(int id);
         Task<IEnumerable<CandidatoPuestoDto>> GetCandidatosDisponiblesAsync(int partidoId);

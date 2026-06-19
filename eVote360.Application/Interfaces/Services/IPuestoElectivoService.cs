@@ -4,10 +4,13 @@ namespace eVote360.Core.Application.Interfaces.Services
 {
     public interface IPuestoElectivoService
     {
-        Task<SavePuestoElectivoDto> AddAsync(SavePuestoElectivoDto dto);
-        Task UpdateAsync(SavePuestoElectivoDto dto);
-        Task<List<PuestoElectivoDto>> GetAllAsync();
-        Task<SavePuestoElectivoDto?> GetByIdSaveDtoAsync(int id);
-        Task ChangeStateAsync(int id, bool state);
+        Task<IEnumerable<PuestoElectivoDto>> GetAllAsync();
+
+        Task<SavePuestoElectivoDto> GetByIdSaveDtoAsync(int id);
+
+        Task AddAsync(SavePuestoElectivoDto vm);
+        Task UpdateAsync(SavePuestoElectivoDto vm);
+
+        Task ChangeStateAsync(int id);
     }
 }

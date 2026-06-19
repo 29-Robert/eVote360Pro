@@ -12,13 +12,13 @@ namespace eVote360.Core.Application.DTOs.Candidato
     public class CrearCandidatoDto
     {
         [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El apellido es obligatorio")]
-        public string Apellido { get; set; }
+        public string Apellido { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La propuesta es obligatoria")]
-        public string Propuesta { get; set; }
+        public string Propuesta { get; set; } = string.Empty;
 
         public string? Foto { get; set; }
         [Required(ErrorMessage = "La foto es obligatoria")]

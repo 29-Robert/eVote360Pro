@@ -8,6 +8,7 @@ namespace eVote360.Core.Application.Interfaces.Services
         Task UpdateAsync(SavePartidoPoliticoDto dto);
         Task<List<PartidoPoliticoDto>> GetAllAsync();
         Task<SavePartidoPoliticoDto?> GetByIdSaveDtoAsync(int id);
-        Task ChangeStateAsync(int id, bool state);
+
+        Task ChangeStateAsync(int id);
     }
 }

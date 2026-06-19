@@ -8,10 +8,12 @@ namespace eVote360.Core.Application.Services
     public class PartidoPoliticoService : IPartidoPoliticoService
     {
         private readonly IGenericRepository<PartidoPolitico> _repository;
+        private readonly IGenericRepository<Eleccion> _eleccionRepository;
 
-        public PartidoPoliticoService(IGenericRepository<PartidoPolitico> repository)
+        public PartidoPoliticoService(IGenericRepository<PartidoPolitico> repository, IGenericRepository<Eleccion> eleccionRepository)
         {
             _repository = repository;
+            _eleccionRepository = eleccionRepository;
         }
 
         public async Task<SavePartidoPoliticoDto> AddAsync(SavePartidoPoliticoDto dto)
@@ -84,12 +86,12 @@ namespace eVote360.Core.Application.Services
             };
         }
 
-        public async Task ChangeStateAsync(int id, bool state)
+        public async Task ChangeStateAsync(int id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity != null)
             {
-                entity.Estado = state;
+                entity.Estado = !entity.Estado; 
                 await _repository.UpdateAsync(entity);
             }
         }

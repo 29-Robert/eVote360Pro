@@ -34,19 +34,22 @@ namespace eVote360.WebApp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SavePuestoElectivoViewModel vm)
         {
-            if (!ModelState.IsValid)
-                return View(vm);
+            if (!ModelState.IsValid) return View(vm);
 
-            var dto = new SavePuestoElectivoDto
+            try
             {
-                Nombre = vm.Nombre,
-                Descripcion = vm.Descripcion
-            };
-
-            await _puestoService.AddAsync(dto);
-            return RedirectToAction(nameof(Index));
+                var dto = new SavePuestoElectivoDto { Nombre = vm.Nombre, Descripcion = vm.Descripcion };
+                await _puestoService.AddAsync(dto);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(vm);
+            }
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -54,37 +57,40 @@ namespace eVote360.WebApp.Controllers
             var dto = await _puestoService.GetByIdSaveDtoAsync(id);
             if (dto == null) return NotFound();
 
-            var vm = new SavePuestoElectivoViewModel
-            {
-                Id = dto.Id,
-                Nombre = dto.Nombre,
-                Descripcion = dto.Descripcion
-            };
-
-            return View(vm);
+            return View(new SavePuestoElectivoViewModel { Id = dto.Id, Nombre = dto.Nombre, Descripcion = dto.Descripcion });
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(SavePuestoElectivoViewModel vm)
         {
-            if (!ModelState.IsValid)
-                return View(vm);
+            if (!ModelState.IsValid) return View(vm);
 
-            var dto = new SavePuestoElectivoDto
+            try
             {
-                Id = vm.Id,
-                Nombre = vm.Nombre,
-                Descripcion = vm.Descripcion
-            };
-
-            await _puestoService.UpdateAsync(dto);
-            return RedirectToAction(nameof(Index));
+                var dto = new SavePuestoElectivoDto { Id = vm.Id, Nombre = vm.Nombre, Descripcion = vm.Descripcion };
+                await _puestoService.UpdateAsync(dto);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(vm);
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangeState(int id, bool state)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeState(int id)
         {
-            await _puestoService.ChangeStateAsync(id, state);
+            try
+            {
+                await _puestoService.ChangeStateAsync(id);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

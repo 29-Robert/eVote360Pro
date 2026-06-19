@@ -2,76 +2,124 @@
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
+using eVote360.Core.Domain.Enums;
 
 namespace eVote360.Core.Application.Services
 {
     public class PuestoElectivoService : IPuestoElectivoService
     {
-        private readonly IGenericRepository<PuestoElectivo> _repository;
+        private readonly IPuestoElectivoRepository _puestoRepository;
+        private readonly IGenericRepository<Eleccion> _eleccionRepository;
+        private readonly ICandidatoPuestoRepository _candidatoPuestoRepository;
 
-        public PuestoElectivoService(IGenericRepository<PuestoElectivo> repository)
+        public PuestoElectivoService(
+            IPuestoElectivoRepository puestoRepository,
+            IGenericRepository<Eleccion> eleccionRepository,
+            ICandidatoPuestoRepository candidatoPuestoRepository)
         {
-            _repository = repository;
+            _puestoRepository = puestoRepository;
+            _eleccionRepository = eleccionRepository;
+            _candidatoPuestoRepository = candidatoPuestoRepository;
         }
 
-        public async Task<SavePuestoElectivoDto> AddAsync(SavePuestoElectivoDto dto)
+        private async Task ValidarEleccionActivaAsync()
         {
-            var entity = new PuestoElectivo
+            var elecciones = await _eleccionRepository.GetAllAsync();
+            if (elecciones.Any(e => e.Estado == EstadoEleccion.Activa))
             {
-                Nombre = dto.Nombre,
-                Descripcion = dto.Descripcion,
-                Estado = true
-            };
-
-            var addedEntity = await _repository.AddAsync(entity);
-            dto.Id = addedEntity.Id;
-            return dto;
-        }
-
-        public async Task UpdateAsync(SavePuestoElectivoDto dto)
-        {
-            var entity = await _repository.GetByIdAsync(dto.Id);
-            if (entity != null)
-            {
-                entity.Nombre = dto.Nombre;
-                entity.Descripcion = dto.Descripcion;
-                await _repository.UpdateAsync(entity);
+                throw new InvalidOperationException("No se pueden modificar puestos electivos mientras exista una elección activa.");
             }
         }
 
-        public async Task<List<PuestoElectivoDto>> GetAllAsync()
+        public async Task<IEnumerable<PuestoElectivoDto>> GetAllAsync()
         {
-            var list = await _repository.GetAllAsync();
-            return list.Select(e => new PuestoElectivoDto
+            var puestos = await _puestoRepository.GetAllAsync();
+            return puestos.Select(p => new PuestoElectivoDto
             {
-                Id = e.Id,
-                Nombre = e.Nombre,
-                Descripcion = e.Descripcion,
-                Estado = e.Estado
+                Id = p.Id,
+                Nombre = p.Nombre,
+                Descripcion = p.Descripcion,
+                Estado = p.Estado
             }).ToList();
         }
 
-        public async Task<SavePuestoElectivoDto?> GetByIdSaveDtoAsync(int id)
+        public async Task<SavePuestoElectivoDto> GetByIdSaveDtoAsync(int id)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) return null;
+            var puesto = await _puestoRepository.GetByIdAsync(id);
+            if (puesto == null) return null!;
 
             return new SavePuestoElectivoDto
             {
-                Id = entity.Id,
-                Nombre = entity.Nombre,
-                Descripcion = entity.Descripcion
+                Id = puesto.Id,
+                Nombre = puesto.Nombre,
+                Descripcion = puesto.Descripcion,
+                Estado = puesto.Estado
             };
         }
 
-        public async Task ChangeStateAsync(int id, bool state)
+        public async Task AddAsync(SavePuestoElectivoDto vm)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null)
+            await ValidarEleccionActivaAsync();
+
+            var puestos = await _puestoRepository.GetAllAsync();
+            if (puestos.Any(p => p.Nombre.Trim().ToLower() == vm.Nombre.Trim().ToLower()))
             {
-                entity.Estado = state;
-                await _repository.UpdateAsync(entity);
+                throw new InvalidOperationException("Ya existe un puesto electivo registrado con este nombre.");
             }
+
+            var puesto = new PuestoElectivo
+            {
+                Nombre = vm.Nombre.Trim(),
+                Descripcion = vm.Descripcion,
+                Estado = true
+            };
+
+            await _puestoRepository.AddAsync(puesto);
+        }
+
+        public async Task UpdateAsync(SavePuestoElectivoDto vm)
+        {
+            await ValidarEleccionActivaAsync();
+
+            var puesto = await _puestoRepository.GetByIdAsync(vm.Id);
+            if (puesto == null) return;
+
+            var puestos = await _puestoRepository.GetAllAsync();
+            if (puestos.Any(p => p.Id != vm.Id && p.Nombre.Trim().ToLower() == vm.Nombre.Trim().ToLower()))
+            {
+                throw new InvalidOperationException("Ya existe un puesto electivo registrado con este nombre.");
+            }
+
+            puesto.Nombre = vm.Nombre.Trim();
+            puesto.Descripcion = vm.Descripcion;
+            puesto.Estado = vm.Estado;
+
+            await _puestoRepository.UpdateAsync(puesto);
+        }
+
+        public async Task ChangeStateAsync(int id)
+        {
+            await ValidarEleccionActivaAsync();
+
+            var puesto = await _puestoRepository.GetByIdAsync(id);
+            if (puesto == null) throw new InvalidOperationException("El puesto no existe.");
+
+            // Si vamos a desactivar (puesto.Estado era true)
+            if (puesto.Estado)
+            {
+                var asignaciones = await _candidatoPuestoRepository.GetAllAsync();
+                if (asignaciones.Any(cp => cp.PuestoElectivoId == id))
+                {
+                    throw new InvalidOperationException("No se puede desactivar este puesto electivo porque tiene candidatos activos asignados.");
+                }
+                puesto.Estado = false;
+            }
+            else
+            {
+                puesto.Estado = true;
+            }
+
+            await _puestoRepository.UpdateAsync(puesto);
         }
     }
 }

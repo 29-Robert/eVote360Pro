@@ -17,10 +17,51 @@ namespace eVote360.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Ciudadano", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorreoElectronico")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DocumentoIdentidad")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Estado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("YaVoto")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CorreoElectronico")
+                        .IsUnique();
+
+                    b.HasIndex("DocumentoIdentidad")
+                        .IsUnique();
+
+                    b.ToTable("Ciudadanos");
+                });
 
             modelBuilder.Entity("eVote360.Core.Domain.Entities.AsignacionDirigente", b =>
                 {
@@ -75,7 +116,7 @@ namespace eVote360.Infrastructure.Persistence.Migrations
                     b.Property<int>("PartidoPoliticoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PuestoElectivoId")
+                    b.Property<int>("PuestoElectivoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -116,44 +157,6 @@ namespace eVote360.Infrastructure.Persistence.Migrations
                     b.HasIndex("PuestoElectivoId");
 
                     b.ToTable("CandidatosPuestos");
-                });
-
-            modelBuilder.Entity("eVote360.Core.Domain.Entities.Ciudadano", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Apellido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CorreoElectronico")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DocumentoIdentidad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("Estado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CorreoElectronico")
-                        .IsUnique();
-
-                    b.HasIndex("DocumentoIdentidad")
-                        .IsUnique();
-
-                    b.ToTable("Ciudadanos");
                 });
 
             modelBuilder.Entity("eVote360.Core.Domain.Entities.CodigoVerificacion", b =>
@@ -376,7 +379,9 @@ namespace eVote360.Infrastructure.Persistence.Migrations
 
                     b.HasOne("eVote360.Core.Domain.Entities.PuestoElectivo", "PuestoElectivo")
                         .WithMany()
-                        .HasForeignKey("PuestoElectivoId");
+                        .HasForeignKey("PuestoElectivoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("PartidoPolitico");
 
