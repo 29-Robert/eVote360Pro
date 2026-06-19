@@ -10,9 +10,11 @@ namespace eVote360.Core.Application.DTOs.Alianzas
         public int Id { get; set; }
         public int PartidoSolicitanteId { get; set; }
         public int PartidoReceptorId { get; set; }
-        public string NombrePartidoSolicitante { get; set; }
-        public string SiglasPartidoSolicitante { get; set; }
-        public string NombrePartidoReceptor { get; set; }
+
+        public string NombrePartidoSolicitante { get; set; } = string.Empty;
+        public string SiglasPartidoSolicitante { get; set; } = string.Empty;
+        public string NombrePartidoReceptor { get; set; } = string.Empty;
+
         public DateTime FechaSolicitud { get; set; }
         public string EstadoNombre => Estado.ToString();
         public string? MotivoRechazo { get; set; }

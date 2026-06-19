@@ -1,4 +1,4 @@
-﻿using eVote360.Core.Application.DTOs.CandidatoPuesto;
+﻿using eVote360.Core.Application.DTOs.Candidato;
 using eVote360.Core.Application.DTOs.PuestosElectivos;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
@@ -6,13 +6,13 @@ using eVote360.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eVote360.Core.Application.Services
 {
     public class CandidatoPuestoService : ICandidatoPuestoService
     {
-       
         private readonly ICandidatoPuestoRepository _repo;
         private readonly IEleccionRepository _eleccionRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -53,24 +53,22 @@ namespace eVote360.Core.Application.Services
 
             var asignacion = await _repo.GetByIdAsync(CandidatoPuestoId);
 
-           
             var claim = _httpContextAccessor.HttpContext.User.FindFirst("PartidoId");
             if (claim == null) throw new Exception("No se pudo identificar al usuario.");
 
-            
             int PartidoId = int.Parse(claim.Value);
 
-           
             if (asignacion.PartidoPoliticoId != PartidoId)
                 throw new Exception("No tiene permisos para eliminar esta asignación.");
 
             await _repo.DeleteAsync(asignacion);
         }
 
-        public async Task<IEnumerable<DTOs.Candidato.CandidatoPuestoDto>> GetByPartidoAsync(int partidoId)
+        public async Task<IEnumerable<CandidatoPuestoDto>> GetByPartidoAsync(int partidoId)
         {
             var asignaciones = await _repo.GetByPartidoAsync(partidoId);
-            return (IEnumerable<DTOs.Candidato.CandidatoPuestoDto>)asignaciones.Select(cp => new CandidatoPuestoDto
+
+            return asignaciones.Select(cp => new CandidatoPuestoDto
             {
                 Id = cp.Id,
                 CandidatoId = cp.CandidatoId,
@@ -85,11 +83,9 @@ namespace eVote360.Core.Application.Services
             });
         }
 
-        public async Task<IEnumerable<DTOs.Candidato.CandidatoPuestoDto>> GetCandidatosDisponiblesAsync(int partidoId)
+        public async Task<IEnumerable<CandidatoPuestoDto>> GetCandidatosDisponiblesAsync(int partidoId)
         {
-            
             return await _repo.GetCandidatosDisponiblesAsync(partidoId);
-
         }
 
         public async Task<IEnumerable<PuestoElectivoDto>> GetPuestosDisponiblesAsync(int partidoId)

@@ -3,6 +3,10 @@ using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
 using BCrypt.Net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eVote360.Core.Application.Services
 {
@@ -104,6 +108,34 @@ namespace eVote360.Core.Application.Services
                 entity.Estado = state;
                 await _repository.UpdateAsync(entity);
             }
+        }
+
+        // --- MÉTODO LOGIN ASYNC IMPLEMENTADO ---
+        public async Task<UsuarioDto?> LoginAsync(LoginDto dto)
+        {
+            var usuarios = await _repository.GetAllAsync();
+
+            // Buscamos primero al usuario por su nombre de usuario único
+            var usuarioEntity = usuarios.FirstOrDefault(u =>
+                u.NombreUsuario.Equals(dto.NombreUsuario, StringComparison.OrdinalIgnoreCase));
+
+            // Si no existe el usuario o la contraseña encriptada no coincide, retornamos null (Credenciales inválidas)
+            if (usuarioEntity == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuarioEntity.PasswordHash))
+            {
+                return null;
+            }
+
+            // Si todo está correcto, mapeamos y retornamos el UsuarioDto
+            return new UsuarioDto
+            {
+                Id = usuarioEntity.Id,
+                Nombre = usuarioEntity.Nombre,
+                Apellido = usuarioEntity.Apellido,
+                CorreoElectronico = usuarioEntity.CorreoElectronico,
+                NombreUsuario = usuarioEntity.NombreUsuario,
+                Rol = usuarioEntity.Rol,
+                Estado = usuarioEntity.Estado
+            };
         }
     }
 }

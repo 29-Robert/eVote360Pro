@@ -9,5 +9,6 @@ namespace eVote360.Core.Application.Interfaces.Services
         Task<List<UsuarioDto>> GetAllAsync();
         Task<SaveUsuarioDto?> GetByIdSaveDtoAsync(int id);
         Task ChangeStateAsync(int id, bool state);
+        Task<UsuarioDto?> LoginAsync(LoginDto dto);
     }
 }

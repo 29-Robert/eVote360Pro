@@ -26,21 +26,18 @@ namespace eVote360.Core.Application.Services
 
         public async Task ActivarEleccionAsync(int id)
         {
-            // 1. Verificar si ya existe otra elección activa en el sistema
             var elecciones = await _eleccionRepository.GetAllAsync();
             if (elecciones.Any(e => e.Estado == EstadoEleccion.Activa))
             {
                 throw new InvalidOperationException("Ya existe un proceso electoral activo. Debe finalizarlo antes de activar uno nuevo.");
             }
 
-            // 2. Validar la Regla de Negocio: Partidos sin candidatos
             var partidos = await _partidoRepository.GetAllAsync();
             var candidatos = await _candidatoRepository.GetAllAsync();
 
             foreach (var partido in partidos)
             {
-                // Verificamos si el partido tiene al menos un candidato inscrito
-                bool tieneCandidatos = candidatos.Any(c => c.PartidoPoliticoId == partido.Id); // Ajustar propiedad según tu entidad
+                bool tieneCandidatos = candidatos.Any(c => c.PartidoPoliticoId == partido.Id); 
                 if (!tieneCandidatos)
                 {
                     throw new InvalidOperationException($"No se puede activar la elección. El partido '{partido.Nombre}' no tiene ningún candidato asignado.");
@@ -63,6 +60,27 @@ namespace eVote360.Core.Application.Services
             {
                 eleccion.Estado = EstadoEleccion.Finalizada;
                 await _eleccionRepository.UpdateAsync(eleccion);
+            }
+        }
+
+        public async Task CambiarEstadoAActivaAsync(int eleccionId)
+        {
+            // 1. Desactivar cualquier elección que esté activa actualmente
+            var eleccionesActivas = await _eleccionRepository.GetAllAsync();
+            var activa = eleccionesActivas.FirstOrDefault(e => e.Estado == EstadoEleccion.Activa);
+
+            if (activa != null)
+            {
+                activa.Estado = EstadoEleccion.Finalizada; // O Pendiente, según tu flujo
+                await _eleccionRepository.UpdateAsync(activa);
+            }
+
+            // 2. Activar la nueva elección
+            var nueva = await _eleccionRepository.GetByIdAsync(eleccionId);
+            if (nueva != null)
+            {
+                nueva.Estado = EstadoEleccion.Activa;
+                await _eleccionRepository.UpdateAsync(nueva);
             }
         }
     }

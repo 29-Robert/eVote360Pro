@@ -17,6 +17,11 @@ namespace eVote360.Infrastructure.Persistence
                     m => m.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            services.AddTransient<IVotoRepository, VotoRepository>();
+            services.AddTransient<IPuestoElectivoRepository, PuestoElectivoRepository>();
+            services.AddTransient<ICandidatoPuestoRepository, CandidatoPuestoRepository>(); 
+            services.AddTransient<IAlianzaRepository, AlianzaRepository>(); 
         }
     }
 }
