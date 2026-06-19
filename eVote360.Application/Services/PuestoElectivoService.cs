@@ -11,15 +11,18 @@ namespace eVote360.Core.Application.Services
         private readonly IPuestoElectivoRepository _puestoRepository;
         private readonly IGenericRepository<Eleccion> _eleccionRepository;
         private readonly ICandidatoPuestoRepository _candidatoPuestoRepository;
+        private readonly IPuestoElectivoRepository _repository; 
 
         public PuestoElectivoService(
             IPuestoElectivoRepository puestoRepository,
             IGenericRepository<Eleccion> eleccionRepository,
-            ICandidatoPuestoRepository candidatoPuestoRepository)
+            ICandidatoPuestoRepository candidatoPuestoRepository,
+            IPuestoElectivoRepository repository)
         {
             _puestoRepository = puestoRepository;
             _eleccionRepository = eleccionRepository;
             _candidatoPuestoRepository = candidatoPuestoRepository;
+            _repository = repository;
         }
 
         private async Task ValidarEleccionActivaAsync()
@@ -97,29 +100,18 @@ namespace eVote360.Core.Application.Services
             await _puestoRepository.UpdateAsync(puesto);
         }
 
-        public async Task ChangeStateAsync(int id)
+        public async Task ChangeStateAsync(int id, bool state)
         {
-            await ValidarEleccionActivaAsync();
+            var puesto = await _repository.GetByIdAsync(id);
 
-            var puesto = await _puestoRepository.GetByIdAsync(id);
-            if (puesto == null) throw new InvalidOperationException("El puesto no existe.");
-
-            // Si vamos a desactivar (puesto.Estado era true)
-            if (puesto.Estado)
+            if (puesto == null)
             {
-                var asignaciones = await _candidatoPuestoRepository.GetAllAsync();
-                if (asignaciones.Any(cp => cp.PuestoElectivoId == id))
-                {
-                    throw new InvalidOperationException("No se puede desactivar este puesto electivo porque tiene candidatos activos asignados.");
-                }
-                puesto.Estado = false;
-            }
-            else
-            {
-                puesto.Estado = true;
+                throw new Exception("El puesto electivo no fue encontrado.");
             }
 
-            await _puestoRepository.UpdateAsync(puesto);
+            puesto.Estado = state;
+
+            await _repository.UpdateAsync(puesto);
         }
     }
 }

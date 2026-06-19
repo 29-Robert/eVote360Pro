@@ -1,5 +1,6 @@
 ﻿using eVote360.Core.Application.DTOs.Ciudadanos;
-using eVote360.Core.Application.DTOs.Votaciones; 
+using eVote360.Core.Application.DTOs.Votaciones;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace eVote360.Core.Application.Interfaces.Services

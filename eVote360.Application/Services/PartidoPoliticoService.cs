@@ -86,14 +86,13 @@ namespace eVote360.Core.Application.Services
             };
         }
 
-        public async Task ChangeStateAsync(int id)
+        public async Task ChangeStateAsync(int id, bool state)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null)
-            {
-                entity.Estado = !entity.Estado; 
-                await _repository.UpdateAsync(entity);
-            }
+            var partido = await _repository.GetByIdAsync(id);
+            if (partido == null) throw new InvalidOperationException("Partido no encontrado");
+
+            partido.Estado = state;
+            await _repository.UpdateAsync(partido);
         }
     }
 }

@@ -6,10 +6,7 @@ using eVote360.Core.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using eVote360.WebApp.ViewModels.Elector;
-using System.IO;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
+
 
 namespace eVote360.WebApp.Controllers
 {
@@ -117,11 +114,11 @@ namespace eVote360.WebApp.Controllers
             }
 
             string cedulaLimpia = model.DocumentoIdentidad.Replace("-", "");
-            /*if (!textoExtraido.Replace("-", "").Contains(cedulaLimpia))
+            if (!textoExtraido.Replace("-", "").Contains(cedulaLimpia))
             {
                 ModelState.AddModelError(string.Empty, "Los datos extraídos de la foto no coinciden con los datos previamente ingresados por el elector.");
                 return View(model);
-            }*/
+            }
 
             return RedirectToAction("EnviarCodigoOtp");
         }
@@ -130,12 +127,13 @@ namespace eVote360.WebApp.Controllers
         public async Task<IActionResult> EnviarCodigoOtp()
         {
             string? cedula = TempData["ElectorDocumento"] as string;
+
             if (string.IsNullOrEmpty(cedula))
             {
                 return RedirectToAction("Index");
             }
 
-            TempData.Keep();
+            TempData.Keep("ElectorDocumento");
 
             var ciudadanos = await _ciudadanoRepository.GetAllAsync();
             var ciudadano = ciudadanos.FirstOrDefault(c => Regex.Replace(c.DocumentoIdentidad, @"[^\d]", "") == cedula);
@@ -155,13 +153,12 @@ namespace eVote360.WebApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            // 🎯 Intentamos enviar el correo real SIN try/catch. 
-            // Si esto falla, Visual Studio se detendrá aquí y nos mostrará el error exacto de MailKit.
+            TempData["CiudadanoId"] = ciudadano.Id;
+            TempData.Keep("CiudadanoId");
+
             await _otpService.EnviarOtpAsync(ciudadano.Id, eleccionActiva.Id, ciudadano.CorreoElectronico);
 
-            // Pasamos el ID del ciudadano a la vista para el siguiente paso
             ViewBag.CiudadanoId = ciudadano.Id;
-
             return View();
         }
 

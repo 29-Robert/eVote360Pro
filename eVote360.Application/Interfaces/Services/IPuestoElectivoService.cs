@@ -11,6 +11,6 @@ namespace eVote360.Core.Application.Interfaces.Services
         Task AddAsync(SavePuestoElectivoDto vm);
         Task UpdateAsync(SavePuestoElectivoDto vm);
 
-        Task ChangeStateAsync(int id);
+        Task ChangeStateAsync(int id, bool state);
     }
 }
