@@ -27,6 +27,13 @@ namespace eVote360.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Voto>> GetByEleccionIdAsync(int eleccionId)
+        {
+            return await _dbContext.Set<Voto>()
+                .Where(v => v.EleccionId == eleccionId)
+                .ToListAsync();
+        }
+
         // 🛠️ AGREGA ESTE MÉTODO PARA SOLUCIONAR EL ERROR CS0535
         public async Task<bool> YaVotoEnEleccionActivaAsync(int ciudadanoId)
         {

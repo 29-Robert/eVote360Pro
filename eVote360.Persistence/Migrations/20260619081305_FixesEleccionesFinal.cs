@@ -5,7 +5,7 @@
 namespace eVote360.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Fixes : Migration
+    public partial class FixesEleccionesFinal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -264,13 +264,19 @@ namespace eVote360.WebApp.Controllers
                 string correoDestino = ciudadano.CorreoElectronico;
                 string asunto = "Resumen de su participación electoral";
 
-                // Texto básico inicial (luego puedes armar el HTML completo con los puestos votados)
+                // Estructura base inicial (luego puedes integrar esta data en tu vista Razor .cshtml o maquetar el string con formato para el correo/PDF)
                 string cuerpoResumen = $"Hola {ciudadano.Nombre},\n\nSu proceso de votación en {eleccion.Nombre} ha sido completado correctamente.\n\nGracias por ejercer su derecho al voto.";
 
                 await _emailService.EnviarResumenVotacionAsync(correoDestino, asunto, cuerpoResumen);
             }
 
-            return RedirectToAction("Gracias"); // Asegúrate de crear una vista llamada "Gracias.cshtml" luego
+            return RedirectToAction("Gracias");
+        }
+
+        [HttpGet]
+        public IActionResult VotoConfirmado()
+        {
+            return View();
         }
     }
 }
