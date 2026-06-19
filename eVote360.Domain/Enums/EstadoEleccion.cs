@@ -8,8 +8,8 @@ namespace eVote360.Core.Domain.Enums
 {
     public enum EstadoEleccion
     {
-        Activa = 1,
-        Pendiente = 2,
+        Pendiente = 1, 
+        Activa = 2,
         Finalizada = 3
     }
 }

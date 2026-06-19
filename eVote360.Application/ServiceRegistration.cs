@@ -22,6 +22,8 @@ namespace eVote360.Core.Application
             services.AddTransient<IAlianzaService, AlianzaService>();
             services.AddTransient<IElectorService, ElectorService>();
             services.AddTransient<IEleccionService, EleccionService>();
+            services.AddTransient<IPuestoElectivoService, PuestoElectivoService>();
+            services.AddTransient<IPartidoPoliticoService, PartidoPoliticoService>();
         }
     }
 }

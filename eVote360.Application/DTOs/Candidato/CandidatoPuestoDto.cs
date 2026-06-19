@@ -13,28 +13,29 @@ namespace eVote360.Core.Application.DTOs.Candidato
         public int CandidatoId { get; set; }
 
         [Required(ErrorMessage = "El nombre del candidato es obligatorio")]
-        public string NombreCandidato { get; set; }
+        public string NombreCandidato { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El apellido del candidato es obligatorio")]
-        public string ApellidoCandidato { get; set; }
+        public string ApellidoCandidato { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La foto del candidato es obligatoria")]
-        public string FotoCandidato { get; set; }
+        public string FotoCandidato { get; set; } = string.Empty;
 
         // Datos del puesto
         public int PuestoElectivoId { get; set; }
 
         [Required(ErrorMessage = "El nombre del puesto es obligatorio")]
-        public string NombrePuesto { get; set; }
+        public string NombrePuesto { get; set; } = string.Empty;
 
         // Datos del partido
         public int PartidoPoliticoId { get; set; }
 
         [Required(ErrorMessage = "El nombre del partido es obligatorio")]
-        public string NombrePartido { get; set; }
+        public string NombrePartido { get; set; } = string.Empty;
 
         // Tipo de candidatura
         public bool EsAliado { get; set; }
+
         public string TipoCandidatura => EsAliado ? "Aliado" : "Propio";
     }
 }

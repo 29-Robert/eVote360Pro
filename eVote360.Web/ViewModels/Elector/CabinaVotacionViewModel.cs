@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using eVote360.Core.Domain.Entities;
-
-namespace eVote360.WebApp.ViewModels.Elector
+﻿namespace eVote360.WebApp.ViewModels.Elector
 {
     public class CabinaVotacionViewModel
     {
@@ -16,6 +13,15 @@ namespace eVote360.WebApp.ViewModels.Elector
         public string NombrePartido { get; set; } = null!;
         public string Siglas { get; set; } = null!;
         public string LogoUrl { get; set; } = null!;
-        public List<Candidato> Candidatos { get; set; } = new();
+        public List<CandidatoConPuestoDto> Candidatos { get; set; } = new();
+    }
+
+    public class CandidatoConPuestoDto
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = null!;
+        public string Apellido { get; set; } = null!;
+        public string Foto { get; set; } = null!;
+        public int PuestoElectivoId { get; set; } 
     }
 }

@@ -2,13 +2,6 @@
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eVote360.Core.Application.DTOs;
 
 namespace eVote360.Core.Application.Services
 {
@@ -17,53 +10,52 @@ namespace eVote360.Core.Application.Services
         private readonly ICandidatoRepository _candidatoRepo;
         private readonly IEleccionRepository _eleccionRepo;
 
-        public CandidatoService(ICandidatoRepository candidatoRepo,
-                                IEleccionRepository eleccionRepo)
+        public CandidatoService(ICandidatoRepository candidatoRepo, IEleccionRepository eleccionRepo)
         {
             _candidatoRepo = candidatoRepo;
             _eleccionRepo = eleccionRepo;
         }
 
-        public async Task ActivarAsync(int id)
+        private async Task ValidarEleccionActiva()
         {
             if (await _eleccionRepo.ExisteEleccionActiva())
-                throw new Exception("No se puede activar un candidato mientras exista una elección activa.");
-
-            var candidato = await _candidatoRepo.GetByIdAsync(id);
-            candidato.EsActivo = true;
-            await _candidatoRepo.UpdateAsync(candidato);
+                throw new Exception("No se pueden realizar cambios mientras exista una elección activa.");
         }
-        
 
-        public async Task CreateAsync(CrearCandidatoDto dto)
+        public async Task AddAsync(SaveCandidatoDto dto)
         {
-            if (await _eleccionRepo.ExisteEleccionActiva())
-                throw new Exception("No se puede crear un candidato mientras exista una elección activa.");
+            await ValidarEleccionActiva();
 
-            var candidato = new Candidato
+            var entity = new Candidato
             {
                 Nombre = dto.Nombre,
                 Apellido = dto.Apellido,
-                Foto = dto.Foto,
-                EsActivo = true,
-                PartidoPoliticoId = dto.PartidoPoliticoId
+                DocumentoIdentidad = dto.DocumentoIdentidad,
+                CorreoElectronico = dto.CorreoElectronico,
+                PartidoPoliticoId = dto.PartidoPoliticoId,
+                PuestoElectivoId = dto.PuestoElectivoId,
+                Foto = dto.Foto ?? "/images/default.png", // Ruta estándar
+                EsActivo = true
             };
-
-            await _candidatoRepo.AddAsync(candidato);
+            await _candidatoRepo.AddAsync(entity);
         }
 
-        public async Task DesactivarAsync(int id)
+        public async Task UpdateAsync(SaveCandidatoDto dto)
         {
-            if (await _eleccionRepo.ExisteEleccionActiva())
-                throw new Exception("No se puede desactivar un candidato mientras exista una elección activa.");
+            await ValidarEleccionActiva();
 
-            var candidato = await _candidatoRepo.GetByIdAsync(id);
+            var entity = await _candidatoRepo.GetByIdAsync(dto.Id);
+            entity.Nombre = dto.Nombre;
+            entity.Apellido = dto.Apellido;
+            entity.DocumentoIdentidad = dto.DocumentoIdentidad;
+            entity.CorreoElectronico = dto.CorreoElectronico;
+            entity.PartidoPoliticoId = dto.PartidoPoliticoId;
+            entity.PuestoElectivoId = dto.PuestoElectivoId;
 
-            if (candidato.PuestoElectivoId != null)
-                throw new Exception("No se puede desactivar este candidato porque está asignado a un puesto electivo.");
+            if (!string.IsNullOrEmpty(dto.Foto))
+                entity.Foto = dto.Foto;
 
-            candidato.EsActivo = false;
-            await _candidatoRepo.UpdateAsync(candidato);
+            await _candidatoRepo.UpdateAsync(entity);
         }
 
         public async Task<CandidatoDTO> GetByIdAsync(int id)
@@ -83,37 +75,24 @@ namespace eVote360.Core.Application.Services
 
         public async Task<IEnumerable<CandidatoDTO>> GetByPartidoAsync(int partidoId)
         {
-            var candidatos = await _candidatoRepo.GetByPartidoAsync(partidoId);
-            return candidatos.Select(c => new CandidatoDTO
+            var list = await _candidatoRepo.GetByPartidoAsync(partidoId);
+            return list.Select(c => new CandidatoDTO
             {
                 Id = c.Id,
                 Nombre = c.Nombre,
                 Apellido = c.Apellido,
                 Foto = c.Foto,
                 EsActivo = c.EsActivo,
-                NombrePartido = c.PartidoPolitico.Nombre,
-                PuestoAsignado = c.PuestoElectivo?.Nombre ?? "Sin puesto asociado"
+                NombrePartido = c.PartidoPolitico.Nombre
             });
         }
-        
 
-        public async Task UpdateAsync(CandidatoUpdateDto dto)
+        public async Task ChangeStateAsync(int id, bool estado)
         {
-            if (await _eleccionRepo.ExisteEleccionActiva())
-                throw new Exception("No se puede editar un candidato mientras exista una elección activa.");
-
-            var candidato = await _candidatoRepo.GetByIdAsync(dto.Id);
-
-            candidato.Nombre = dto.Nombre;
-            candidato.Apellido = dto.Apellido;
-            candidato.EsActivo = dto.EsActivo;
-
-            if (dto.Foto != null)
-                candidato.Foto = dto.Foto;
-
+            await ValidarEleccionActiva();
+            var candidato = await _candidatoRepo.GetByIdAsync(id);
+            candidato.EsActivo = estado;
             await _candidatoRepo.UpdateAsync(candidato);
         }
     }
-    
-
 }
