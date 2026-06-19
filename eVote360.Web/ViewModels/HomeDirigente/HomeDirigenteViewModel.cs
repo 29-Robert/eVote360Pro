@@ -2,9 +2,6 @@
 {
     public class HomeDirigenteViewModel
     {
-
-
-
         public string NombreCompleto { get; set; } = null!;
         public string NombrePartido { get; set; } = null!;
         public string SiglasPartido { get; set; } = null!;
@@ -15,9 +12,5 @@
         public int AlianzasPendientes { get; set; }
         public int CandidatosAsignados { get; set; }
 
-
-
-
-    }
-    
+    }    
 }

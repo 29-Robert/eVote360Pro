@@ -7,6 +7,7 @@ namespace eVote360.Core.Application.Interfaces.Repositories
     {
         Task<Voto> GetByCiudadanoPuestoAsync(int ciudadanoId, int puestoId);
         Task<IEnumerable<Voto>> GetByCiudadanoEleccionAsync(int ciudadanoId, int eleccionId);
+        Task<IEnumerable<Voto>> GetByEleccionIdAsync(int eleccionId);
         Task<bool> YaVotoEnEleccionActivaAsync(int ciudadanoId);
     }
 }

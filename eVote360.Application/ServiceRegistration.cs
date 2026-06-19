@@ -1,4 +1,6 @@
-﻿using eVote360.Core.Application.Interfaces.Services;
+﻿using eVote360.Application.Interfaces.Services;
+using eVote360.Application.Services;
+using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +10,6 @@ namespace eVote360.Core.Application
     {
         public static void AddApplicationLayer(this IServiceCollection services)
         {
-            // --- Servicios de Persona 1 ---
             services.AddTransient<IPuestoElectivoService, PuestoElectivoService>();
             services.AddTransient<ICiudadanoService, CiudadanoService>();
             services.AddTransient<IPartidoPoliticoService, PartidoPoliticoService>();
@@ -16,12 +17,12 @@ namespace eVote360.Core.Application
             services.AddTransient<IAsignacionDirigenteService, AsignacionDirigenteService>();
             services.AddTransient<IEleccionValidationService, EleccionValidationService>();
 
-            // --- Servicios de Persona 2 ---
             services.AddTransient<ICandidatoService, CandidatoService>();
             services.AddTransient<ICandidatoPuestoService, CandidatoPuestoService>();
             services.AddTransient<IAlianzaService, AlianzaService>();
             services.AddTransient<IElectorService, ElectorService>();
             services.AddTransient<IEleccionService, EleccionService>();
+            services.AddTransient<IResultadoService, ResultadoService>();
             services.AddTransient<IPuestoElectivoService, PuestoElectivoService>();
             services.AddTransient<IPartidoPoliticoService, PartidoPoliticoService>();
         }

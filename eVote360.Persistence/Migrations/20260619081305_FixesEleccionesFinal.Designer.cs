@@ -12,8 +12,8 @@ using eVote360.Infrastructure.Persistence.Contexts;
 namespace eVote360.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260619043133_Fixes")]
-    partial class Fixes
+    [Migration("20260619081305_FixesEleccionesFinal")]
+    partial class FixesEleccionesFinal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

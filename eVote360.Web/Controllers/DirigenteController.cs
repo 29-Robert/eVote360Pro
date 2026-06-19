@@ -81,19 +81,14 @@ namespace eVote360.WebApp.Controllers
 
             var vm = new HomeDirigenteViewModel
             {
-                UsuarioId = usuario.Id,
-                Nombre = usuario.Nombre,
-                Apellido = usuario.Apellido,
-                NombreUsuario = usuario.NombreUsuario,
-                PartidoPoliticoId = partido.Id,
+                NombreCompleto = $"{usuario.Nombre} {usuario.Apellido}",
                 NombrePartido = partido.Nombre,
                 SiglasPartido = partido.Siglas,
                 PartidoActivo = partido.Estado,
                 TotalCandidatos = totalCandidatos,
                 CandidatosActivos = candidatosActivos,
                 CandidatosAsignados = candidatosAsignados,
-                AlianzasPendientes = alianzasPendientes,
-                AlianzasAceptadas = alianzasAceptadas,
+                AlianzasPendientes = alianzasPendientes
             };
 
             return View(vm);
