@@ -37,7 +37,7 @@ namespace eVote360.Core.Application.Services
             {
                 Nombre = dto.Nombre,
                 FechaRealizacion = dto.FechaRealizacion,
-                Estado = EstadoEleccion.Pendiente // Arranca siempre bloqueada
+                Estado = EstadoEleccion.Pendiente
             };
 
             await _eleccionRepository.AddAsync(nuevaEleccion);
@@ -47,7 +47,7 @@ namespace eVote360.Core.Application.Services
         {
             var elecciones = await _eleccionRepository.GetAllAsync();
 
-            // 1. REGLA: Impedir doble activación simultánea
+
             if (elecciones.Any(e => e.Estado == EstadoEleccion.Activa))
             {
                 throw new InvalidOperationException("Ya existe un proceso electoral activo. Debe finalizarlo antes de activar uno nuevo.");
@@ -56,7 +56,7 @@ namespace eVote360.Core.Application.Services
             var partidos = await _partidoRepository.GetAllAsync();
             var candidatos = await _candidatoRepository.GetAllAsync();
 
-            // 2. REGLA: Validar requisitos mínimos de candidatos por partido
+
             foreach (var partido in partidos)
             {
                 bool tieneCandidatos = candidatos.Any(c => c.PartidoPoliticoId == partido.Id);
@@ -66,7 +66,7 @@ namespace eVote360.Core.Application.Services
                 }
             }
 
-            // 3. Cambiar el estado a Activa
+
             var eleccion = await _eleccionRepository.GetByIdAsync(id);
             if (eleccion != null)
             {

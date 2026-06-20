@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace eVote360.WebApp.ViewModels.PartidosPoliticos
@@ -18,5 +18,6 @@ namespace eVote360.WebApp.ViewModels.PartidosPoliticos
         public IFormFile? LogoFile { get; set; }
 
         public string? LogoUrl { get; set; }
+        public bool PuedeEditarCamposCriticos { get; set; } = true;
     }
 }

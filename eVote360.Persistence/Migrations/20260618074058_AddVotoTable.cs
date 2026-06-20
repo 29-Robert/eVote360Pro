@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace eVote360.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddVotoTable : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -29,7 +29,7 @@ namespace eVote360.Infrastructure.Persistence.Migrations
                 });
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

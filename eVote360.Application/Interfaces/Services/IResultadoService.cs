@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using eVote360.Core.Application.DTOs.Resultado; 
 
 namespace eVote360.Application.Interfaces.Services
@@ -6,5 +7,6 @@ namespace eVote360.Application.Interfaces.Services
     public interface IResultadoService
     {
         Task<ResultadoEleccionDto> CalcularResultadosAsync(int eleccionId);
+        Task<IEnumerable<ResumenEleccionAnualDto>> GetResumenAnualAsync(int year);
     }
 }

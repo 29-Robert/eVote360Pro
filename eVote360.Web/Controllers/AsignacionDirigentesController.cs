@@ -1,6 +1,7 @@
-﻿using eVote360.Core.Application.DTOs.Asignaciones;
+using eVote360.Core.Application.DTOs.Asignaciones;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.AsignacionDirigentes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -9,11 +10,12 @@ using System.Threading.Tasks;
 
 namespace eVote360.WebApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class AsignacionDirigentesController : Controller
     {
         private readonly IAsignacionDirigenteService _asignacionService;
         private readonly IUsuarioService _usuarioService;
-        // Asumo que tienes un servicio para los partidos llamado IPartidoPoliticoService
+
         private readonly IPartidoPoliticoService _partidoService;
         private readonly IEleccionValidationService _validationService;
 
@@ -49,9 +51,14 @@ namespace eVote360.WebApp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SaveAsignacionViewModel vm)
         {
-            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+            if (await _validationService.HasEleccionActivaAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden modificar asignaciones mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (!ModelState.IsValid)
             {
@@ -68,6 +75,7 @@ namespace eVote360.WebApp.Controllers
                 };
 
                 await _asignacionService.AddAsync(dto);
+                TempData["SuccessMessage"] = "Dirigente asignado al partido político exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -79,11 +87,24 @@ namespace eVote360.WebApp.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+            if (await _validationService.HasEleccionActivaAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden modificar asignaciones mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _asignacionService.DeleteAsync(id);
+            try
+            {
+                await _asignacionService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Asignación eliminada exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
 

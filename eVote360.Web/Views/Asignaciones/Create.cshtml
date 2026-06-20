@@ -1,5 +1,55 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model eVote360.WebApp.ViewModels.Asignaciones.AgregarAsignacionesViewModel
+
 @{
+    ViewData["Title"] = "Nueva Asignación de Candidato";
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0 text-center"><i class="bi bi-person-plus-fill me-2"></i>Nueva Asignación a Puesto</h4>
+        </div>
+        <div class="card-body p-4 bg-light">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-action="Agregar" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="CandidatoId" class="form-label fw-bold">Candidato</label>
+                    <select asp-for="CandidatoId" asp-items="Model.CandidatosDisponibles" class="form-select">
+                        <option value="">-- Seleccione un Candidato --</option>
+                    </select>
+                    <span asp-validation-for="CandidatoId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="PuestoElectivoId" class="form-label fw-bold">Puesto Electivo</label>
+                    <select asp-for="PuestoElectivoId" asp-items="Model.PuestosDisponibles" class="form-select">
+                        <option value="">-- Seleccione un Puesto --</option>
+                    </select>
+                    <span asp-validation-for="PuestoElectivoId" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-50">
+                        <i class="bi bi-save me-1"></i> Guardar Asignación
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary w-50">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

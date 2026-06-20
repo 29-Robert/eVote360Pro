@@ -46,7 +46,7 @@ namespace eVote360.Core.Application.Services
                 throw new InvalidOperationException("Este ciudadano se encuentra inactivo y no está autorizado para votar.");
             }
 
-            // Validación de voto doble utilizando tu IVotoRepository
+
             var yaVoto = await _votoRepository.YaVotoEnEleccionActivaAsync(elector.Id);
             if (yaVoto)
             {
@@ -81,7 +81,7 @@ namespace eVote360.Core.Application.Services
         public async Task<ValidacionVotacionDto> ValidarFinalizacionAsync(int ciudadanoId, int eleccionId)
         {
             var puestos = await _puestoRepository.GetAllAsync();
-            // Filtramos los puestos que estén activos según su propiedad de Estado
+
             var puestosActivos = puestos.Where(p => p.Estado).ToList();
 
             var votos = await _votoRepository.GetByCiudadanoEleccionAsync(ciudadanoId, eleccionId);
@@ -101,7 +101,7 @@ namespace eVote360.Core.Application.Services
             var ciudadano = await _ciudadanoRepository.GetByIdAsync(ciudadanoId);
             if (ciudadano != null)
             {
-                // Sincronizado con tu modelo: cambiamos su Estado a false para deshabilitar futuros accesos
+
                 ciudadano.Estado = false;
                 await _ciudadanoRepository.UpdateAsync(ciudadano);
             }

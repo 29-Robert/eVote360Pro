@@ -9,5 +9,6 @@ namespace eVote360.Core.Application.Interfaces.Services
         Task<List<CiudadanoDto>> GetAllAsync();
         Task<SaveCiudadanoDto?> GetByIdSaveDtoAsync(int id);
         Task ChangeStateAsync(int id, bool state);
+        Task<bool> PuedeModificarDocumentoIdentidadAsync(int ciudadanoId);
     }
 }

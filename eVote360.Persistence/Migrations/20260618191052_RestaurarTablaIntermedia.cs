@@ -4,10 +4,10 @@
 
 namespace eVote360.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
+
     public partial class RestaurarTablaIntermedia : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
@@ -40,7 +40,7 @@ namespace eVote360.Infrastructure.Persistence.Migrations
                 onDelete: ReferentialAction.Cascade);
         }
 
-        /// <inheritdoc />
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(

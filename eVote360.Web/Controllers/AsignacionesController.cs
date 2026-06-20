@@ -1,6 +1,7 @@
-﻿using eVote360.Core.Application.Interfaces.Repositories;
+using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.Asignaciones;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace eVote360.WebApp.Controllers
 {
+    [Authorize(Roles = "Dirigente político")]
     public class AsignacionesController : Controller
     {
         private readonly ICandidatoPuestoService _asignacionService;

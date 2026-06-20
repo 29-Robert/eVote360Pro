@@ -1,5 +1,6 @@
 ﻿using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Domain.Entities;
+using eVote360.Core.Domain.Enums;
 using eVote360.Infrastructure.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,12 +35,22 @@ namespace eVote360.Infrastructure.Persistence.Repositories
                 .ToListAsync();
         }
 
-        // 🛠️ AGREGA ESTE MÉTODO PARA SOLUCIONAR EL ERROR CS0535
         public async Task<bool> YaVotoEnEleccionActivaAsync(int ciudadanoId)
         {
-            // Retorna true si el ciudadano ya tiene al menos un voto registrado en el sistema
             return await _dbContext.Set<Voto>()
                 .AnyAsync(v => v.CiudadanoId == ciudadanoId);
+        }
+
+        public async Task<bool> HaParticipadoEnEleccionActivaOFinalizadaAsync(int ciudadanoId)
+        {
+            return await _dbContext.Set<Voto>()
+                .Where(v => v.CiudadanoId == ciudadanoId)
+                .Join(
+                    _dbContext.Elecciones,
+                    voto => voto.EleccionId,
+                    eleccion => eleccion.Id,
+                    (_, eleccion) => eleccion)
+                .AnyAsync(e => e.Estado == EstadoEleccion.Activa || e.Estado == EstadoEleccion.Finalizada);
         }
     }
 }

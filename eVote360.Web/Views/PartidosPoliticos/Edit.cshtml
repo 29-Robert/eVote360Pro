@@ -1,0 +1,108 @@
+@model eVote360.WebApp.ViewModels.PartidosPoliticos.SavePartidoPoliticoViewModel
+
+@{
+    ViewData["Title"] = "Editar Partido Político";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="m-0"><i class="bi bi-pencil-square me-2"></i>Editar Partido Político</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+
+                    @if (!Model.PuedeEditarCamposCriticos)
+                    {
+                        <div class="alert alert-warning border-start border-warning border-4 py-2 mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            No se puede modificar el nombre, siglas o logo de este partido porque ya participó en procesos electorales.
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="LogoUrl" />
+                        <input type="hidden" asp-for="PuedeEditarCamposCriticos" />
+
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label asp-for="Nombre" class="form-label fw-bold">Nombre del Partido</label>
+                                @if (Model.PuedeEditarCamposCriticos)
+                                {
+                                    <input asp-for="Nombre" class="form-control" placeholder="Ej. Partido..." required />
+                                }
+                                else
+                                {
+                                    <input asp-for="Nombre" class="form-control" readonly />
+                                }
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Siglas" class="form-label fw-bold">Siglas</label>
+                                @if (Model.PuedeEditarCamposCriticos)
+                                {
+                                    <input asp-for="Siglas" class="form-control" placeholder="Ej. PRM" required />
+                                }
+                                else
+                                {
+                                    <input asp-for="Siglas" class="form-control" readonly />
+                                }
+                                <span asp-validation-for="Siglas" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="Descripcion" class="form-label fw-bold">Descripción</label>
+                                <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Breve descripción del partido..."></textarea>
+                                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label asp-for="LogoFile" class="form-label fw-bold">Actualizar Logo</label>
+                                @if (Model.PuedeEditarCamposCriticos)
+                                {
+                                    <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" />
+                                    <div class="form-text">Deje este campo vacío si no desea cambiar el logo actual. Formatos: JPG, PNG, WEBP.</div>
+                                }
+                                else
+                                {
+                                    <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" disabled />
+                                    <div class="form-text text-danger">Modificación de logo inhabilitada por participación electoral.</div>
+                                }
+                                <span asp-validation-for="LogoFile" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4 text-center">
+                                <label class="form-label fw-bold d-block">Logo Actual</label>
+                                @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                                {
+                                    <img src="@Model.LogoUrl" alt="Logo actual" class="img-thumbnail" style="max-height: 100px; object-fit: contain;" />
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary p-2">Sin logo registrado</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">Volver atrás</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

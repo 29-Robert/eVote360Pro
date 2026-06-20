@@ -1,4 +1,4 @@
-﻿using eVote360.Core.Application.DTOs.Usuarios;
+using eVote360.Core.Application.DTOs.Usuarios;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
@@ -21,18 +21,24 @@ namespace eVote360.Core.Application.Services
 
         public async Task<SaveUsuarioDto> AddAsync(SaveUsuarioDto dto)
         {
-            var usuarios = await _repository.GetAllAsync();
-            if (usuarios.Any(u => u.NombreUsuario == dto.NombreUsuario || u.CorreoElectronico == dto.CorreoElectronico))
+
+            if (dto.Rol != "Administrador" && dto.Rol != "Dirigente político")
             {
-                throw new InvalidOperationException("El nombre de usuario o correo ya existe.");
+                throw new InvalidOperationException("El rol seleccionado es inválido. Solo se permiten 'Administrador' o 'Dirigente político'.");
+            }
+
+            var usuarios = await _repository.GetAllAsync();
+            if (usuarios.Any(u => u.NombreUsuario.Trim().ToLower() == dto.NombreUsuario.Trim().ToLower() || u.CorreoElectronico.Trim().ToLower() == dto.CorreoElectronico.Trim().ToLower()))
+            {
+                throw new InvalidOperationException("El nombre de usuario o correo electrónico ya existe.");
             }
 
             var entity = new Usuario
             {
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                CorreoElectronico = dto.CorreoElectronico,
-                NombreUsuario = dto.NombreUsuario,
+                Nombre = dto.Nombre.Trim(),
+                Apellido = dto.Apellido.Trim(),
+                CorreoElectronico = dto.CorreoElectronico.Trim().ToLower(),
+                NombreUsuario = dto.NombreUsuario.Trim(),
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Rol = dto.Rol,
                 Estado = true
@@ -45,28 +51,43 @@ namespace eVote360.Core.Application.Services
 
         public async Task UpdateAsync(SaveUsuarioDto dto)
         {
+
+            if (dto.Rol != "Administrador" && dto.Rol != "Dirigente político")
+            {
+                throw new InvalidOperationException("El rol seleccionado es inválido. Solo se permiten 'Administrador' o 'Dirigente político'.");
+            }
+
             var usuarios = await _repository.GetAllAsync();
-            if (usuarios.Any(u => (u.NombreUsuario == dto.NombreUsuario || u.CorreoElectronico == dto.CorreoElectronico) && u.Id != dto.Id))
+            if (usuarios.Any(u => (u.NombreUsuario.Trim().ToLower() == dto.NombreUsuario.Trim().ToLower() || u.CorreoElectronico.Trim().ToLower() == dto.CorreoElectronico.Trim().ToLower()) && u.Id != dto.Id))
             {
-                throw new InvalidOperationException("El nombre de usuario o correo ya existe.");
+                throw new InvalidOperationException("El nombre de usuario o correo electrónico ya existe.");
             }
 
-            var entity = await _repository.GetByIdAsync(dto.Id);
-            if (entity != null)
-            {
-                entity.Nombre = dto.Nombre;
-                entity.Apellido = dto.Apellido;
-                entity.CorreoElectronico = dto.CorreoElectronico;
-                entity.NombreUsuario = dto.NombreUsuario;
-                entity.Rol = dto.Rol;
+            var entity = await _repository.GetByIdAsync(dto.Id)
+                ?? throw new KeyNotFoundException($"El usuario con ID {dto.Id} no existe.");
 
-                if (!string.IsNullOrEmpty(dto.Password))
+
+            if (entity.Rol == "Administrador" && entity.Estado && dto.Rol != "Administrador")
+            {
+                var activeAdmins = usuarios.Count(u => u.Rol == "Administrador" && u.Estado && u.Id != dto.Id);
+                if (activeAdmins == 0)
                 {
-                    entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+                    throw new InvalidOperationException("No se puede cambiar el rol al único administrador activo del sistema.");
                 }
-
-                await _repository.UpdateAsync(entity);
             }
+
+            entity.Nombre = dto.Nombre.Trim();
+            entity.Apellido = dto.Apellido.Trim();
+            entity.CorreoElectronico = dto.CorreoElectronico.Trim().ToLower();
+            entity.NombreUsuario = dto.NombreUsuario.Trim();
+            entity.Rol = dto.Rol;
+
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+            }
+
+            await _repository.UpdateAsync(entity);
         }
 
         public async Task<List<UsuarioDto>> GetAllAsync()
@@ -102,30 +123,36 @@ namespace eVote360.Core.Application.Services
 
         public async Task ChangeStateAsync(int id, bool state)
         {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity != null)
+            var entity = await _repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"El usuario con ID {id} no existe.");
+
+
+            if (!state && entity.Rol == "Administrador" && entity.Estado)
             {
-                entity.Estado = state;
-                await _repository.UpdateAsync(entity);
+                var usuarios = await _repository.GetAllAsync();
+                var activeAdmins = usuarios.Count(u => u.Rol == "Administrador" && u.Estado && u.Id != id);
+                if (activeAdmins == 0)
+                {
+                    throw new InvalidOperationException("No se puede desactivar al único administrador activo del sistema.");
+                }
             }
+
+            entity.Estado = state;
+            await _repository.UpdateAsync(entity);
         }
 
-        // --- MÉTODO LOGIN ASYNC IMPLEMENTADO ---
         public async Task<UsuarioDto?> LoginAsync(LoginDto dto)
         {
             var usuarios = await _repository.GetAllAsync();
 
-            // Buscamos primero al usuario por su nombre de usuario único
             var usuarioEntity = usuarios.FirstOrDefault(u =>
                 u.NombreUsuario.Equals(dto.NombreUsuario, StringComparison.OrdinalIgnoreCase));
 
-            // Si no existe el usuario o la contraseña encriptada no coincide, retornamos null (Credenciales inválidas)
             if (usuarioEntity == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuarioEntity.PasswordHash))
             {
                 return null;
             }
 
-            // Si todo está correcto, mapeamos y retornamos el UsuarioDto
             return new UsuarioDto
             {
                 Id = usuarioEntity.Id,

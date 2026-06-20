@@ -1,4 +1,4 @@
-﻿@model IEnumerable<dynamic>
+@model IEnumerable<eVote360.Core.Application.DTOs.Asignaciones.AsignacionDirigenteDto>
 
 <div class="container mt-4">
     @if (TempData["ErrorMessage"] != null)
@@ -42,10 +42,10 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td class="ps-3 fw-bold">@item.UsuarioNombre</td>
-                                <td>@item.UsuarioUsername</td>
-                                <td>@item.PartidoNombre</td>
-                                <td><span class="badge bg-primary">@item.PartidoSiglas</span></td>
+                                <td class="ps-3 fw-bold">@item.NombreDirigente</td>
+                                <td>@item.NombreUsuario</td>
+                                <td>@item.NombrePartido</td>
+                                <td><span class="badge bg-primary">@item.SiglasPartido</span></td>
                                 <td class="text-center pe-3">
                                     @if (!(ViewBag.IsEleccionActiva ?? false))
                                     {

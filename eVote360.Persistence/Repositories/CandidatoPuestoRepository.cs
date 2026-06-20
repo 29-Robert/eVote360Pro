@@ -67,7 +67,7 @@ namespace eVote360.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<PuestoElectivoDto>> GetPuestosDisponiblesAsync(int partidoId)
         {
-            // Puestos que ya tienen candidato en este partido
+
             var ocupados = await _context.CandidatosPuestos
                 .Where(cp => cp.PartidoPoliticoId == partidoId)
                 .Select(cp => cp.PuestoElectivoId)
@@ -117,7 +117,7 @@ namespace eVote360.Infrastructure.Persistence.Repositories
 
         public Task<IEnumerable<CandidatoPuesto>> GetAllAsync()
         {
-            throw new NotImplementedException();//
+            throw new NotImplementedException();
         }
     }
 }

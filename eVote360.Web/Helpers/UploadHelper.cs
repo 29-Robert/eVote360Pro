@@ -9,11 +9,11 @@ namespace eVote360.WebApp.Helpers
         {
             if (file == null || file.Length == 0) return null;
 
-            // Generar un nombre único para evitar colisiones
+
             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderPath);
 
-            // Crear carpeta si no existe
+
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             string filePath = Path.Combine(path, fileName);

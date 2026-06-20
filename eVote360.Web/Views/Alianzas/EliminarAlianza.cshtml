@@ -1,0 +1,37 @@
+@model eVote360.Core.Domain.Entities.SolicitudAlianza
+
+@{
+    ViewData["Title"] = "Romper Alianza";
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card shadow-sm border-0 border-start border-warning border-4">
+        <div class="card-header bg-warning bg-opacity-10 py-3">
+            <h4 class="mb-0 text-warning-dark"><i class="bi bi-shield-slash-fill me-2"></i>Disolver Alianza Política</h4>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <p class="fs-5">
+                ¿Estás seguro de que deseas disolver el pacto de alianza entre el partido 
+                <strong>@(Model.PartidoSolicitante?.Nombre ?? "...")</strong> y 
+                <strong>@(Model.PartidoReceptor?.Nombre ?? "...")</strong>?
+            </p>
+            <div class="alert alert-danger small shadow-sm">
+                <i class="bi bi-exclamation-octagon-fill me-2"></i> <strong>Atención:</strong> Romper este pacto eliminará todas las candidaturas conjuntas (candidatos aliados) asignados entre ambos partidos y es una acción irreversible.
+            </div>
+
+            <form asp-action="EliminarAlianzaConfirmado" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-50">
+                        <i class="bi bi-trash-fill me-1"></i> Confirmar y Disolver
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary w-50">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

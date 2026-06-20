@@ -1,4 +1,8 @@
-﻿using eVote360.Core.Application.DTOs.Resultado; 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using eVote360.Core.Application.DTOs.Resultado; 
 using eVote360.Core.Application.Interfaces.Repositories; 
 using eVote360.Core.Domain.Enums;
 using eVote360.Application.Interfaces.Services;
@@ -88,6 +92,50 @@ namespace eVote360.Application.Services
             resultadoDto.Candidatos = candidatosOrdenados;
 
             return resultadoDto;
+        }
+
+        public async Task<IEnumerable<ResumenEleccionAnualDto>> GetResumenAnualAsync(int year)
+        {
+            var elecciones = await _eleccionRepository.GetAllAsync();
+            var eleccionesDelAnio = elecciones.Where(e => e.FechaRealizacion.Year == year).ToList();
+
+            var resumenes = new List<ResumenEleccionAnualDto>();
+
+            foreach (var eleccion in eleccionesDelAnio)
+            {
+                var votos = (await _votoRepository.GetByEleccionIdAsync(eleccion.Id)).ToList();
+
+                var candidateIds = votos
+                    .Where(v => v.CandidatoId.HasValue)
+                    .Select(v => v.CandidatoId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var partyIds = new HashSet<int>();
+                foreach (var cId in candidateIds)
+                {
+                    var candidato = await _candidatoRepository.GetByIdAsync(cId);
+                    if (candidato != null)
+                    {
+                        partyIds.Add(candidato.PartidoPoliticoId);
+                    }
+                }
+
+                var totalVotantes = votos.Select(v => v.CiudadanoId).Distinct().Count();
+
+                resumenes.Add(new ResumenEleccionAnualDto
+                {
+                    EleccionId = eleccion.Id,
+                    NombreEleccion = eleccion.Nombre,
+                    FechaRealizacion = eleccion.FechaRealizacion,
+                    Estado = eleccion.Estado.ToString(),
+                    CantidadPartidos = partyIds.Count,
+                    CantidadCandidatos = candidateIds.Count,
+                    CantidadVotantes = totalVotantes
+                });
+            }
+
+            return resumenes;
         }
     }
 }

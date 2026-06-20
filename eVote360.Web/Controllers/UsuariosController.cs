@@ -1,12 +1,14 @@
-﻿using eVote360.Core.Application.DTOs.Usuarios;
+using eVote360.Core.Application.DTOs.Usuarios;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.Usuarios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
 namespace eVote360.WebApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class UsuariosController : Controller
     {
         private readonly IUsuarioService _usuarioService;
@@ -38,7 +40,11 @@ namespace eVote360.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SaveUsuarioViewModel vm)
         {
-            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+            if (await _validationService.HasEleccionActivaAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden modificar usuarios mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (string.IsNullOrEmpty(vm.Contrasena))
             {
@@ -62,10 +68,12 @@ namespace eVote360.WebApp.Controllers
                 };
 
                 await _usuarioService.AddAsync(dto);
+                TempData["SuccessMessage"] = "Usuario creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
+                TempData["ErrorMessage"] = $"Error al crear el usuario: {ex.Message}";
                 ModelState.AddModelError("", ex.Message);
                 return View(vm);
             }
@@ -79,7 +87,7 @@ namespace eVote360.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Corrección: Usando el método correcto de tu interfaz
+
             var dto = await _usuarioService.GetByIdSaveDtoAsync(id);
             if (dto == null) return NotFound();
 
@@ -91,7 +99,7 @@ namespace eVote360.WebApp.Controllers
                 Correo = dto.CorreoElectronico,
                 NombreUsuario = dto.NombreUsuario,
                 Rol = dto.Rol
-                // La propiedad Estado no se asigna porque no está en el DTO
+
             };
 
             return View(vm);
@@ -100,7 +108,11 @@ namespace eVote360.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(SaveUsuarioViewModel vm)
         {
-            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+            if (await _validationService.HasEleccionActivaAsync())
+            {
+                TempData["ErrorMessage"] = "No se pueden modificar usuarios mientras exista una elección activa.";
+                return RedirectToAction(nameof(Index));
+            }
 
             if (!ModelState.IsValid) return View(vm);
 
@@ -119,10 +131,12 @@ namespace eVote360.WebApp.Controllers
                 };
 
                 await _usuarioService.UpdateAsync(dto);
+                TempData["SuccessMessage"] = "Usuario actualizado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
+                TempData["ErrorMessage"] = $"Error al actualizar el usuario: {ex.Message}";
                 ModelState.AddModelError("", ex.Message);
                 return View(vm);
             }
@@ -131,9 +145,21 @@ namespace eVote360.WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangeState(int id, bool state)
         {
-            if (await _validationService.HasEleccionActivaAsync()) return RedirectToAction(nameof(Index));
+            try
+            {
+                if (await _validationService.HasEleccionActivaAsync())
+                {
+                    TempData["ErrorMessage"] = "No se pueden modificar usuarios mientras exista una elección activa.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-            await _usuarioService.ChangeStateAsync(id, state);
+                await _usuarioService.ChangeStateAsync(id, state);
+                TempData["SuccessMessage"] = $"Usuario {(state ? "activado" : "desactivado")} exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al cambiar el estado del usuario: {ex.Message}";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

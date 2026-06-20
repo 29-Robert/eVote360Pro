@@ -1,0 +1,84 @@
+@model eVote360.WebApp.ViewModels.Ciudadanos.SaveCiudadanoViewModel
+
+@{
+    ViewData["Title"] = "Crear ciudadano";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="m-0"><i class="bi bi-person-plus-fill me-2"></i>Crear ciudadano</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Nombre" class="form-label fw-bold"></label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej. Juan" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Apellido" class="form-label fw-bold"></label>
+                                <input asp-for="Apellido" class="form-control" placeholder="Ej. Pérez" />
+                                <span asp-validation-for="Apellido" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CorreoElectronico" class="form-label fw-bold"></label>
+                                <input asp-for="CorreoElectronico" class="form-control" placeholder="juan.perez@email.com" />
+                                <span asp-validation-for="CorreoElectronico" class="text-danger small"></span>
+                                <div class="form-text">Se utilizará para códigos de verificación y resumen de votación.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DocumentoIdentidad" class="form-label fw-bold"></label>
+                                <input asp-for="DocumentoIdentidad"
+                                       class="form-control"
+                                       placeholder="00112345678"
+                                       maxlength="20"
+                                       inputmode="numeric"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                                <span asp-validation-for="DocumentoIdentidad" class="text-danger small"></span>
+                                <div class="form-text">Se almacena como texto para preservar ceros iniciales.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input asp-for="Estado" class="form-check-input" role="switch" />
+                                    <label asp-for="Estado" class="form-check-label fw-bold">Ciudadano activo</label>
+                                </div>
+                                <div class="form-text">Por defecto, el ciudadano se registra como activo.</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">Volver atrás</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Crear ciudadano
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var input = document.getElementById("DocumentoIdentidad");
+            if (input) {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            }
+        });
+    </script>
+}

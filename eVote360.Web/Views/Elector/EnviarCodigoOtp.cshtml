@@ -26,13 +26,13 @@
                     <form asp-controller="Elector" asp-action="VerificarOtp" method="post" class="mt-4">
                         @Html.AntiForgeryToken()
 
-                        <!-- Enviamos el ID del ciudadano de forma oculta -->
+                        
                         <input type="hidden" name="ciudadanoId" value="@ViewBag.CiudadanoId" />
 
                         <div class="mb-4">
                             <label for="codigoOtp" class="form-label fw-bold text-secondary text-uppercase tracking-wider small">Ingrese el código de 6 dígitos</label>
 
-                            @* Input optimizado con padding-left para contrarrestar el letter-spacing del placeholder *@
+                            
                             <input type="text"
                                    id="codigoOtp"
                                    name="codigoOtp"

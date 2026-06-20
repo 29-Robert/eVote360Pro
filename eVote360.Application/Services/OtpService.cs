@@ -68,7 +68,7 @@ namespace eVote360.Core.Application.Services
                 return false;
             }
 
-            // 🔒 Consumo del token para asegurar un solo uso
+
             otpValido.Usado = true;
             await _otpRepository.UpdateAsync(otpValido);
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +18,10 @@ namespace eVote360.Core.Application.DTOs.Candidato
         public string? PuestoAsignado { get; set; }
         public bool EsActivo { get; set; }
         public string? Foto { get; set; }
+
+        public string DocumentoIdentidad { get; set; } = string.Empty;
+        public string CorreoElectronico { get; set; } = string.Empty;
+        public int PartidoPoliticoId { get; set; }
+        public int PuestoElectivoId { get; set; }
     }
 }

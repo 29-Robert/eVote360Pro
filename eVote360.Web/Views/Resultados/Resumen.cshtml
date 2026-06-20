@@ -1,0 +1,176 @@
+@model IEnumerable<eVote360.Core.Application.DTOs.Resultado.ResumenEleccionAnualDto>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Resumen Electoral Anual";
+    int selectedYear = ViewBag.SelectedYear;
+}
+
+<div class="container my-5">
+    <div class="card bg-dark text-white shadow-sm border-0 mb-4 rounded-3 overflow-hidden">
+        <div class="card-body p-4 bg-gradient position-relative" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold mb-1"><i class="bi bi-bar-chart-line-fill me-2"></i>Resumen Electoral por Año</h2>
+                    <p class="mb-0 text-light opacity-75">Consulte la participación ciudadana, candidatos activos y partidos involucrados en los procesos del año.</p>
+                </div>
+                <div class="col-md-4 mt-3 mt-md-0">
+                    <form asp-controller="Resultados" asp-action="Resumen" method="get" class="d-flex justify-content-md-end">
+                        <div class="input-group" style="max-width: 250px;">
+                            <span class="input-group-text bg-white border-0 text-primary fw-bold"><i class="bi bi-calendar3"></i></span>
+                            <select name="year" class="form-select border-0 shadow-none fw-bold" onchange="this.form.submit()">
+                                @for (int y = DateTime.Now.Year + 2; y >= 2020; y--)
+                                {
+                                    if (y == selectedYear)
+                                    {
+                                        <option value="@y" selected>Año @y</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@y">Año @y</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h6 class="text-uppercase text-muted fw-bold mb-1 small">Procesos Electorales</h6>
+                            <h2 class="display-6 fw-bold mb-0 text-dark">@Model.Count()</h2>
+                        </div>
+                        <div class="bg-primary-subtle text-primary p-3 rounded-circle">
+                            <i class="bi bi-box-seam fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small">Total de elecciones registradas en @selectedYear</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h6 class="text-uppercase text-muted fw-bold mb-1 small">Ciudadanos Votantes</h6>
+                            <h2 class="display-6 fw-bold mb-0 text-dark">@Model.Sum(m => m.CantidadVotantes)</h2>
+                        </div>
+                        <div class="bg-success-subtle text-success p-3 rounded-circle">
+                            <i class="bi bi-people-fill fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small">Participación ciudadana acumulada en @selectedYear</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h6 class="text-uppercase text-muted fw-bold mb-1 small">Candidatos con Votos</h6>
+                            <h2 class="display-6 fw-bold mb-0 text-dark">@Model.Sum(m => m.CantidadCandidatos)</h2>
+                        </div>
+                        <div class="bg-info-subtle text-info p-3 rounded-circle">
+                            <i class="bi bi-person-fill-check fs-3"></i>
+                        </div>
+                    </div>
+                    <span class="text-muted small">Candidatos que recibieron sufragios en @selectedYear</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title fw-bold mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Detalle de Elecciones del Año @selectedYear</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase fs-7">
+                        <tr>
+                            <th class="ps-4">Elección</th>
+                            <th>Fecha Realización</th>
+                            <th>Estado</th>
+                            <th class="text-center">Partidos</th>
+                            <th class="text-center">Candidatos con Votos</th>
+                            <th class="text-center">Ciudadanos Votantes</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    No se encontraron procesos electorales para el año @selectedYear.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">@item.NombreEleccion</td>
+                                    <td>@item.FechaRealizacion.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.Estado == "Pendiente")
+                                        {
+                                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Pendiente</span>
+                                        }
+                                        else if (item.Estado == "Activa")
+                                        {
+                                            <span class="badge bg-success px-3 py-2 rounded-pill">Activa</span>
+                                        }
+                                        else if (item.Estado == "Finalizada")
+                                        {
+                                            <span class="badge bg-secondary px-3 py-2 rounded-pill">Finalizada</span>
+                                        }
+                                    </td>
+                                    <td class="text-center fw-semibold">@item.CantidadPartidos</td>
+                                    <td class="text-center fw-semibold">@item.CantidadCandidatos</td>
+                                    <td class="text-center fw-semibold text-primary">@item.CantidadVotantes</td>
+                                    <td class="text-end pe-4">
+                                        @if (item.Estado == "Finalizada")
+                                        {
+                                            <a asp-controller="Resultados" asp-action="Escrutinio" asp-route-eleccionId="@item.EleccionId" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="bi bi-eye-fill me-1"></i> Escrutinio
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-sm btn-light text-muted rounded-pill" disabled>
+                                                <i class="bi bi-lock-fill"></i> No Disponible
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

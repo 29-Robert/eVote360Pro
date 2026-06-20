@@ -1,0 +1,36 @@
+@model eVote360.Core.Domain.Entities.SolicitudAlianza
+
+@{
+    ViewData["Title"] = "Cancelar Solicitud de Alianza";
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card shadow-sm border-0 border-start border-secondary border-4">
+        <div class="card-header bg-secondary bg-opacity-10 py-3">
+            <h4 class="mb-0 text-secondary"><i class="bi bi-x-circle me-2"></i>Cancelar Solicitud de Alianza</h4>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <p class="fs-5">
+                ¿Estás seguro de que deseas retirar y cancelar tu solicitud de alianza enviada al partido 
+                <strong>@(Model.PartidoReceptor?.Nombre ?? "...")</strong> (<strong>@(Model.PartidoReceptor?.Siglas ?? "...")</strong>)?
+            </p>
+            <div class="alert alert-light border small shadow-sm text-muted">
+                <i class="bi bi-info-circle me-2"></i> El partido receptor ya no verá esta solicitud en su panel y la propuesta quedará cancelada.
+            </div>
+
+            <form asp-action="EliminarSolicitudConfirmado" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-secondary w-50">
+                        <i class="bi bi-dash-circle-fill me-1"></i> Confirmar y Cancelar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-50">
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

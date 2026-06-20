@@ -1,8 +1,9 @@
-﻿using eVote360.Core.Application.DTOs.Usuarios;
+using eVote360.Core.Application.DTOs.Usuarios;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +30,11 @@ namespace eVote360.WebApp.Controllers
 
         public IActionResult Index()
         {
-            // Si ya está autenticado, lo enviamos a su Home
+
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                if (User.IsInRole("Administrador")) return RedirectToAction("Index", "Home");
-                if (User.IsInRole("Dirigente político")) return RedirectToAction("Index", "HomeDirigente"); // Pantalla de la Persona 2
+                if (User.IsInRole("Administrador")) return RedirectToAction("Dashboard", "Admin");
+                if (User.IsInRole("Dirigente político")) return RedirectToAction("Dashboard", "Dirigente");
             }
 
             return View(new LoginViewModel());
@@ -64,7 +65,8 @@ namespace eVote360.WebApp.Controllers
                 return View(vm);
             }
 
-            // Validaciones exclusivas para el Dirigente Político
+
+            int? partidoPoliticoId = null;
             if (user.Rol == "Dirigente político")
             {
                 var asignaciones = await _asignacionService.GetAllAsync();
@@ -84,9 +86,11 @@ namespace eVote360.WebApp.Controllers
                     ModelState.AddModelError("", "El partido político asignado a este usuario se encuentra inactivo.");
                     return View(vm);
                 }
+
+                partidoPoliticoId = miAsignacion.PartidoPoliticoId;
             }
 
-            // Crear las credenciales de sesión (Cookies)
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -95,20 +99,26 @@ namespace eVote360.WebApp.Controllers
                 new Claim(ClaimTypes.Role, user.Rol)
             };
 
+            if (partidoPoliticoId.HasValue)
+            {
+                claims.Add(new Claim("PartidoId", partidoPoliticoId.Value.ToString()));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            // Redirección por rol
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            HttpContext.Session.SetInt32("UsuarioId", user.Id);
+
+
             if (user.Rol == "Administrador")
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Admin");
             }
             else
             {
-                // Este controlador lo creará tu compañero (Persona 2)
-                return RedirectToAction("Index", "HomeDirigente");
+                return RedirectToAction("Dashboard", "Dirigente");
             }
         }
 

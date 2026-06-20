@@ -1,0 +1,36 @@
+@model eVote360.Core.Domain.Entities.SolicitudAlianza
+
+@{
+    ViewData["Title"] = "Rechazar Alianza";
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card shadow-sm border-0 border-start border-danger border-4">
+        <div class="card-header bg-danger bg-opacity-10 py-3">
+            <h4 class="mb-0 text-danger"><i class="bi bi-shield-x me-2"></i>Rechazar Alianza Política</h4>
+        </div>
+        <div class="card-body p-4 bg-light">
+            <p class="fs-5">
+                ¿Estás seguro de que deseas rechazar la propuesta de alianza del partido 
+                <strong>@(Model.PartidoSolicitante?.Nombre ?? "Cargando...")</strong> (<strong>@(Model.PartidoSolicitante?.Siglas ?? "...")</strong>)?
+            </p>
+            <div class="alert alert-warning small shadow-sm">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Esta acción es permanente. El partido solicitante será notificado y no se concretará la alianza.
+            </div>
+
+            <form asp-action="RechazarConfirmado" method="post" class="mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger w-50">
+                        <i class="bi bi-trash me-1"></i> Confirmar y Rechazar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary w-50">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

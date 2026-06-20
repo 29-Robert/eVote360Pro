@@ -1,4 +1,4 @@
-﻿@model eVote360.WebApp.ViewModels.Elector.CabinaVotacionViewModel
+@model eVote360.WebApp.ViewModels.Elector.CabinaVotacionViewModel
 
 @{
     Layout = "_Layout";
@@ -8,41 +8,127 @@
 <div class="container my-5">
     <div class="text-center mb-5">
         <span class="badge bg-danger text-uppercase px-3 py-2 mb-2 tracking-wider fw-bold">Cabina Virtual Activa</span>
-        <h2 class="fw-black text-dark">@Model.NombreEleccion</h2>
+        <h2 class="fw-black text-dark display-5">@Model.NombreEleccion</h2>
+        <p class="text-muted">Por favor, seleccione un candidato (o la opción Ninguno) para cada uno de los puestos electivos abajo listados.</p>
     </div>
 
-    @foreach (var partido in Model.Partidos)
+    @if (!ViewData.ModelState.IsValid)
     {
-        <!-- Aquí al usar @partido.PartidoId, la referencia subirá a 1 -->
-        <div class="card shadow-sm border-0 mb-5 rounded-3 overflow-hidden" data-partido-id="@partido.PartidoId">
-            <div class="card-header bg-light p-4 border-bottom">
-                <h4 class="mb-0 fw-bold text-dark">@partido.NombrePartido (@partido.Siglas)</h4>
+        <div class="alert alert-danger shadow-sm border-0 mb-4 rounded-3 d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    @foreach (var puesto in Model.Puestos)
+    {
+        <div class="card shadow-sm border-0 mb-5 rounded-3 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-person-badge me-2 text-primary"></i>@puesto.NombrePuesto</h4>
+                @if (puesto.CandidatoSeleccionadoId.HasValue || puesto.SeleccionadoNinguno)
+                {
+                    <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Selección Registrada</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="bi bi-exclamation-circle-fill me-1"></i> Pendiente</span>
+                }
             </div>
 
-            <div class="card-body p-4">
+            <div class="card-body p-4 bg-light">
                 <div class="row g-4 justify-content-center">
-                    @foreach (var candidato in partido.Candidatos)
+
+                    
+                    @foreach (var candidato in puesto.Candidatos)
                     {
-                        <div class="col-md-4">
-                            <div class="card h-100 text-center p-3">
-                                <img src="@candidato.Foto" class="card-img-top mx-auto" style="width: 100px; height: 100px;" />
-                                <div class="card-body">
-                                    <h5 class="fw-bold">@candidato.Nombre @candidato.Apellido</h5>
+                        bool esSeleccionado = puesto.CandidatoSeleccionadoId == candidato.Id;
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+                            <div class="card h-100 text-center shadow-sm border-2 rounded-3 transition-card @(esSeleccionado ? "border-primary bg-primary-subtle" : "border-light bg-white")">
+                                <div class="position-relative">
+                                    <img src="@candidato.Foto" class="card-img-top mx-auto mt-4 rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover;" alt="Foto de @candidato.Nombre" />
+                                    @if (esSeleccionado)
+                                    {
+                                        <span class="position-absolute top-0 start-50 translate-middle badge bg-primary px-3 py-2 rounded-pill shadow-sm">
+                                            <i class="bi bi-check-lg me-1"></i> Seleccionado
+                                        </span>
+                                    }
+                                </div>
+                                <div class="card-body d-flex flex-column p-4">
+                                    <h5 class="fw-bold mb-1">@candidato.Nombre @candidato.Apellido</h5>
+                                    <p class="text-secondary small mb-3">@candidato.NombrePartido (@candidato.SiglasPartido)</p>
 
-                                    <form asp-controller="Elector" asp-action="RegistrarVoto" method="post">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="candidatoId" value="@candidato.Id" />
-                                        <input type="hidden" name="puestoId" value="@candidato.PuestoElectivoId" />
-                                        <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
+                                    <div class="mt-auto">
+                                        <form asp-controller="Elector" asp-action="RegistrarVoto" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="candidatoId" value="@candidato.Id" />
+                                            <input type="hidden" name="puestoId" value="@puesto.PuestoId" />
+                                            <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
 
-                                        <button type="submit" class="btn btn-outline-dark w-100">
-                                            Votar
-                                        </button>
-                                    </form>
+                                            @if (esSeleccionado)
+                                            {
+                                                <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" disabled>
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Voto Asignado
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-outline-primary w-100 rounded-pill fw-bold hover-filled">
+                                                    Seleccionar
+                                                </button>
+                                            }
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     }
+
+                    
+                    @{
+                        bool ningunoSeleccionado = puesto.SeleccionadoNinguno;
+                    }
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="card h-100 text-center shadow-sm border-2 rounded-3 transition-card @(ningunoSeleccionado ? "border-danger bg-danger-subtle" : "border-light bg-white")">
+                            <div class="position-relative mt-4">
+                                <div class="mx-auto rounded-circle shadow-sm bg-secondary-subtle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                    <i class="bi bi-slash-circle text-secondary fs-1"></i>
+                                </div>
+                                @if (ningunoSeleccionado)
+                                {
+                                    <span class="position-absolute top-0 start-50 translate-middle badge bg-danger px-3 py-2 rounded-pill shadow-sm">
+                                        <i class="bi bi-check-lg me-1"></i> Seleccionado
+                                    </span>
+                                }
+                            </div>
+                            <div class="card-body d-flex flex-column p-4">
+                                <h5 class="fw-bold mb-1">Ninguno</h5>
+                                <p class="text-secondary small mb-3">Voto en blanco / Ningún candidato</p>
+
+                                <div class="mt-auto">
+                                    <form asp-controller="Elector" asp-action="RegistrarVoto" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="candidatoId" value="0" />
+                                        <input type="hidden" name="puestoId" value="@puesto.PuestoId" />
+                                        <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
+
+                                        @if (ningunoSeleccionado)
+                                        {
+                                            <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold" disabled>
+                                                <i class="bi bi-check-circle-fill me-1"></i> Voto Asignado
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-outline-danger w-100 rounded-pill fw-bold hover-filled">
+                                                Seleccionar
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -50,8 +136,22 @@
 
     <div class="text-center mt-5">
         <form asp-controller="Elector" asp-action="FinalizarVotacion" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="eleccionId" value="@Model.EleccionId" />
-            <button type="submit" class="btn btn-success btn-lg px-5">Finalizar votación</button>
+            <button type="submit" class="btn btn-success btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg text-uppercase fs-5">
+                <i class="bi bi-check-all me-2"></i> Finalizar Votación
+            </button>
         </form>
     </div>
 </div>
+
+<style>
+    .transition-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .transition-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+</style>

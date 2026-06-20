@@ -1,4 +1,4 @@
-﻿using eVote360.Core.Application.DTOs.PuestosElectivos;
+using eVote360.Core.Application.DTOs.PuestosElectivos;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
@@ -11,18 +11,18 @@ namespace eVote360.Core.Application.Services
         private readonly IPuestoElectivoRepository _puestoRepository;
         private readonly IGenericRepository<Eleccion> _eleccionRepository;
         private readonly ICandidatoPuestoRepository _candidatoPuestoRepository;
-        private readonly IPuestoElectivoRepository _repository; 
+        private readonly IVotoRepository _votoRepository; 
 
         public PuestoElectivoService(
             IPuestoElectivoRepository puestoRepository,
             IGenericRepository<Eleccion> eleccionRepository,
             ICandidatoPuestoRepository candidatoPuestoRepository,
-            IPuestoElectivoRepository repository)
+            IVotoRepository votoRepository)
         {
             _puestoRepository = puestoRepository;
             _eleccionRepository = eleccionRepository;
             _candidatoPuestoRepository = candidatoPuestoRepository;
-            _repository = repository;
+            _votoRepository = votoRepository;
         }
 
         private async Task ValidarEleccionActivaAsync()
@@ -93,16 +93,26 @@ namespace eVote360.Core.Application.Services
                 throw new InvalidOperationException("Ya existe un puesto electivo registrado con este nombre.");
             }
 
+            if (puesto.Nombre.Trim().ToLower() != vm.Nombre.Trim().ToLower())
+            {
+                var votos = await _votoRepository.GetAllAsync();
+                if (votos.Any(v => v.PuestoElectivoId == vm.Id))
+                {
+                    throw new InvalidOperationException("No se puede modificar el nombre de un puesto electivo que ya ha sido utilizado en votaciones.");
+                }
+            }
+
             puesto.Nombre = vm.Nombre.Trim();
             puesto.Descripcion = vm.Descripcion;
-            puesto.Estado = vm.Estado;
 
             await _puestoRepository.UpdateAsync(puesto);
         }
 
         public async Task ChangeStateAsync(int id, bool state)
         {
-            var puesto = await _repository.GetByIdAsync(id);
+            await ValidarEleccionActivaAsync();
+
+            var puesto = await _puestoRepository.GetByIdAsync(id);
 
             if (puesto == null)
             {
@@ -111,7 +121,7 @@ namespace eVote360.Core.Application.Services
 
             puesto.Estado = state;
 
-            await _repository.UpdateAsync(puesto);
+            await _puestoRepository.UpdateAsync(puesto);
         }
     }
 }

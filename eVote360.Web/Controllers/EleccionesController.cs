@@ -1,18 +1,20 @@
-﻿using eVote360.Core.Application.DTOs.Votaciones;
+using eVote360.Core.Application.DTOs.Votaciones;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
 using eVote360.Core.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
 namespace eVote360.WebApp.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class EleccionesController : Controller
     {
         private readonly IEleccionService _eleccionService;
 
-        // 🛠️ Corrección: Eliminamos la inyección directa del DbContext para respetar Onion Architecture
+
         public EleccionesController(IEleccionService eleccionService)
         {
             _eleccionService = eleccionService;
@@ -23,7 +25,7 @@ namespace eVote360.WebApp.Controllers
         {
             try
             {
-                // 🛠️ Usamos el servicio de aplicación en lugar de consultar la BD directamente
+
                 var elecciones = await _eleccionService.GetAllAsync();
                 return View(elecciones);
             }
@@ -51,7 +53,7 @@ namespace eVote360.WebApp.Controllers
 
             try
             {
-                // 🛠️ Delegamos la creación al servicio de negocio
+
                 await _eleccionService.CrearEleccionAsync(dto);
 
                 TempData["SuccessMessage"] = "¡El proceso electoral ha sido registrado exitosamente en estado Pendiente!";

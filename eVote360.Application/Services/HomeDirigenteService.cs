@@ -35,17 +35,17 @@ namespace eVote360.Core.Application.Services
             if (usuario == null)
                 return (false, "Usuario no encontrado.", null);
 
-            // CORRECCIÓN: Validamos pasando por el puente "AsignacionDirigente"
+
             if (usuario.AsignacionDirigente == null || usuario.AsignacionDirigente.PartidoPoliticoId == null)
                 return (false, "No tiene un partido político asignado. Por favor, póngase en contacto con un administrador.", null);
 
-            // CORRECCIÓN: Extraemos el partido desde la asignación
+
             var partido = usuario.AsignacionDirigente.PartidoPolitico;
 
             if (partido == null || !partido.Estado)
                 return (false, "El partido político asignado a este usuario se encuentra inactivo.", null);
 
-            // Retornamos el ID del partido correctamente
+
             return (true, string.Empty, partido.Id);
         }
 

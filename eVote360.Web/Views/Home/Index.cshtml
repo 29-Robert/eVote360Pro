@@ -1,56 +1,73 @@
-﻿@{
-    ViewData["Title"] = "Resumen Electoral";
+﻿@model eVote360.WebApp.ViewModels.Home.HomePublicaViewModel
+
+@{
+    ViewData["Title"] = "Inicio Electoral";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-dark m-0">Panel del Administrador</h2>
-            <p class="text-muted">Resumen general de los procesos electorales.</p>
+<div class="container my-5">
+    <div class="row justify-content-center align-items-center g-5">
+        <div class="col-lg-6 text-center text-lg-start">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3 px-3 py-2 rounded-pill">
+                <i class="bi bi-shield-check me-1"></i> Plataforma oficial de votación
+            </span>
+            <h1 class="display-5 fw-bold text-dark mb-3">Bienvenido a eVote360 Pro</h1>
+            <p class="lead text-muted mb-4">
+                Ejercite su derecho al voto de forma segura. Ingrese su número de documento de identidad
+                para iniciar el proceso de verificación y acceder a la cabina electoral.
+            </p>
+            <ul class="list-unstyled text-muted small">
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Verificación de identidad con OCR</li>
+                <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Confirmación por código OTP</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Votación digital auditada</li>
+            </ul>
         </div>
-    </div>
 
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-body bg-light">
-            <form method="get" asp-action="Index" class="row align-items-end g-3">
-                <div class="col-md-4">
-                    <label for="anioElectoral" class="form-label fw-bold text-dark">Año electoral</label>
-                    <select id="anioElectoral" name="anio" class="form-select">
-                        <option value="">Seleccione un año...</option>
-                        <option value="2026">2026</option>
-                    </select>
+        <div class="col-lg-5">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-4 rounded-top-3">
+                    <h3 class="mb-1 fw-bold">Ingreso de Elector</h3>
+                    <p class="mb-0 small text-light">Introduzca su cédula para comenzar</p>
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary shadow-sm">
-                        <i class="bi bi-search"></i> Obtener Resumen Electoral
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+                <div class="card-body p-4">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped m-0 align-middle text-center">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="ps-3 text-start">Nombre de la elección</th>
-                            <th>Fecha de realización</th>
-                            <th>Partidos participantes</th>
-                            <th>Candidatos participantes</th>
-                            <th class="pe-3">Ciudadanos que votaron</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5" class="py-4 text-muted">
-                                <i class="bi bi-info-circle"></i> Seleccione un año para visualizar el resumen electoral.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <form asp-controller="Elector" asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label asp-for="DocumentoIdentidad" class="form-label fw-semibold text-secondary"></label>
+                            <input asp-for="DocumentoIdentidad"
+                                   class="form-control form-control-lg border-2 rounded-3 text-center fs-4 fw-bold text-primary"
+                                   placeholder="00112345678"
+                                   maxlength="11"
+                                   pattern="\d*"
+                                   inputmode="numeric"
+                                   autocomplete="off"
+                                   autofocus
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                            <span asp-validation-for="DocumentoIdentidad" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm py-2">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar proceso de votación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3 rounded-bottom-3 border-top-0">
+                    <span class="text-muted small">
+                        ¿Es administrador o dirigente?
+                        Use el botón <strong>Acceder</strong> del menú superior.
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,154 @@
+@model eVote360.Core.Domain.Entities.PartidoPolitico
+@{
+    ViewData["Title"] = "Detalles de Mi Partido";
+    var candidatos = ViewBag.Candidatos as List<eVote360.Core.Domain.Entities.Candidato> ?? new List<eVote360.Core.Domain.Entities.Candidato>();
+}
+
+<div class="container mt-4 animate-fade-in">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Dirigente" asp-action="Dashboard" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Mi Partido</li>
+        </ol>
+    </nav>
+
+    
+    <div class="card shadow-sm border-0 mb-5 card-glass">
+        <div class="card-header bg-dark text-white py-3 rounded-top-3">
+            <h4 class="m-0 fw-bold"><i class="bi bi-flag-fill me-2 text-warning"></i> Ficha Informativa del Partido</h4>
+        </div>
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+                    @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                    {
+                        <img src="@Model.LogoUrl" alt="Logo de @Model.Nombre" class="img-fluid rounded-4 shadow-sm border border-light-subtle p-2 bg-white" style="max-height: 180px; object-fit: contain;" />
+                    }
+                    else
+                    {
+                        <div class="bg-secondary-subtle rounded-4 d-flex align-items-center justify-content-center border" style="height: 180px;">
+                            <i class="bi bi-flag fs-1 text-muted"></i>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-9">
+                    <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                        <h2 class="fw-bold text-dark mb-0">@Model.Nombre</h2>
+                        <span class="fs-4 fw-light text-muted">(@Model.Siglas)</span>
+                        @if (Model.Estado)
+                        {
+                            <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>
+                        }
+                    </div>
+                    <p class="text-muted fs-5 mb-0">
+                        @(string.IsNullOrEmpty(Model.Descripcion) ? "Este partido político aún no dispone de una descripción detallada en la plataforma." : Model.Descripcion)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between py-3">
+            <h5 class="m-0 fw-bold"><i class="bi bi-people-fill me-2 text-primary"></i> Nómina de Candidatos Registrados</h5>
+            <span class="badge bg-primary rounded-pill px-3">Total: @candidatos.Count</span>
+        </div>
+        <div class="card-body p-0">
+            @if (candidatos.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" style="width: 80px;" class="ps-4">Foto</th>
+                                <th scope="col">Nombre Completo</th>
+                                <th scope="col">Cédula</th>
+                                <th scope="col">Correo Electrónico</th>
+                                <th scope="col">Cargo/Puesto</th>
+                                <th scope="col">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in candidatos)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        @if (!string.IsNullOrEmpty(c.Foto))
+                                        {
+                                            <img src="@c.Foto" alt="Foto de @c.Nombre" class="rounded-circle shadow-sm border" style="width: 45px; height: 45px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                                <i class="bi bi-person-fill text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark">@c.Nombre @c.Apellido</span>
+                                    </td>
+                                    <td class="font-monospace text-muted">@c.DocumentoIdentidad</td>
+                                    <td><a href="mailto:@c.CorreoElectronico" class="text-decoration-none text-muted">@c.CorreoElectronico</a></td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">
+                                            @c.PuestoElectivo?.Nombre
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (c.EsActivo)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i> Activo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i> Inactivo</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-5 text-center bg-light">
+                    <i class="bi bi-people fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="text-dark">No hay candidatos registrados</h5>
+                    <p class="text-muted">Inscriba nuevos candidatos desde la sección de gestión para verlos listados aquí.</p>
+                    <a asp-controller="Candidatos" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">
+                        <i class="bi bi-plus-circle me-1"></i> Registrar Primer Candidato
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .card-glass {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

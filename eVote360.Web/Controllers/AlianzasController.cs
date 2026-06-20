@@ -1,13 +1,15 @@
-﻿using eVote360.Core.Application.DTOs.Alianzas;
+using eVote360.Core.Application.DTOs.Alianzas;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.WebApp.ViewModels.Alianzas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 
 namespace eVote360.WebApp.Controllers
 {
+    [Authorize(Roles = "Dirigente político")]
     public class AlianzasController : Controller
     {
         private readonly IAlianzaRepository alianzaRepo;
@@ -39,7 +41,7 @@ namespace eVote360.WebApp.Controllers
         {
             if (await _eleccionRepo.ExisteEleccionActiva())
             {
-                TempData["Error"] = "No se pueden modificar alianzas mientras exista una elección activa.";
+                TempData["ErrorMessage"] = "No se pueden modificar alianzas mientras exista una elección activa.";
                 return RedirectToAction("Index");
             }
 
@@ -67,19 +69,25 @@ namespace eVote360.WebApp.Controllers
                 var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
                 await _alianzaService.CrearSolicitudAsync(partidoId, vm.PartidoReceptorId);
         
-        TempData["Exito"] = "Solicitud de alianza enviada correctamente.";
-        return RedirectToAction("Index");
-    }
-    catch (Exception ex)
-    {
-        TempData["Error"] = ex.Message;
-        return View(vm);
-    }
+                TempData["SuccessMessage"] = "Solicitud de alianza enviada correctamente.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return View(vm);
+            }
         }
 
         public async Task<IActionResult> Aceptar(int id)
         {
+            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
             var solicitud = await alianzaRepo.GetByIdAsync(id);
+            if (solicitud == null || solicitud.PartidoReceptorId != partidoId)
+            {
+                TempData["ErrorMessage"] = "No tiene permisos para responder esta solicitud.";
+                return RedirectToAction("Index");
+            }
             return View(solicitud);
         }
 
@@ -90,18 +98,24 @@ namespace eVote360.WebApp.Controllers
             {
                 await _alianzaService.AceptarAsync(id);
 
-                TempData["Exito"] = "Alianza aceptada correctamente.";
+                TempData["SuccessMessage"] = "Alianza aceptada correctamente.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["ErrorMessage"] = ex.Message;
             }
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Rechazar(int id)
         {
+            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
             var solicitud = await alianzaRepo.GetByIdAsync(id);
+            if (solicitud == null || solicitud.PartidoReceptorId != partidoId)
+            {
+                TempData["ErrorMessage"] = "No tiene permisos para responder esta solicitud.";
+                return RedirectToAction("Index");
+            }
             return View(solicitud);
         }
 
@@ -111,18 +125,24 @@ namespace eVote360.WebApp.Controllers
             try
             {
                 await _alianzaService.RechazarAsync(id);
-                TempData["Exito"] = "Solicitud rechazada correctamente.";
+                TempData["SuccessMessage"] = "Solicitud rechazada correctamente.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["ErrorMessage"] = ex.Message;
             }
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> EliminarSolicitud(int id)
         {
+            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
             var solicitud = await alianzaRepo.GetByIdAsync(id);
+            if (solicitud == null || solicitud.PartidoSolicitanteId != partidoId)
+            {
+                TempData["ErrorMessage"] = "No tiene permisos para eliminar esta solicitud.";
+                return RedirectToAction("Index");
+            }
             return View(solicitud);
         }
 
@@ -132,18 +152,24 @@ namespace eVote360.WebApp.Controllers
             try
             {
                 await _alianzaService.EliminarSolicitudAsync(id);
-                TempData["Exito"] = "Solicitud eliminada correctamente.";
+                TempData["SuccessMessage"] = "Solicitud eliminada correctamente.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["ErrorMessage"] = ex.Message;
             }
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> EliminarAlianza(int id)
         {
+            var partidoId = int.Parse(User.FindFirst("PartidoId").Value);
             var solicitud = await alianzaRepo.GetByIdAsync(id);
+            if (solicitud == null || (solicitud.PartidoSolicitanteId != partidoId && solicitud.PartidoReceptorId != partidoId))
+            {
+                TempData["ErrorMessage"] = "No tiene permisos para eliminar esta alianza.";
+                return RedirectToAction("Index");
+            }
             return View(solicitud);
         }
 
@@ -152,13 +178,12 @@ namespace eVote360.WebApp.Controllers
         {
             try
             {
-
                 await _alianzaService.EliminarAlianzaAsync(id);
-                TempData["Exito"] = "Alianza eliminada correctamente.";
+                TempData["SuccessMessage"] = "Alianza eliminada correctamente.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData["ErrorMessage"] = ex.Message;
             }
             return RedirectToAction("Index");
         }

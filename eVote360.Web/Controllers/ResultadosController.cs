@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using eVote360.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eVote360.WebApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador")]
     public class ResultadosController : Controller
     {
         private readonly IResultadoService _resultadoService;
@@ -38,6 +39,24 @@ namespace eVote360.WebApp.Controllers
             {
                 TempData["ErrorMessage"] = "Ocurrió un error inesperado al procesar los resultados.";
                 return RedirectToAction("Index", "Elecciones");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Resumen(int? year)
+        {
+            int selectedYear = year ?? DateTime.Now.Year;
+            ViewBag.SelectedYear = selectedYear;
+
+            try
+            {
+                var resumenes = await _resultadoService.GetResumenAnualAsync(selectedYear);
+                return View(resumenes);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error al obtener el resumen electoral: {ex.Message}";
+                return View(new List<eVote360.Core.Application.DTOs.Resultado.ResumenEleccionAnualDto>());
             }
         }
     }

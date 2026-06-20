@@ -1,10 +1,11 @@
-﻿using eVote360.Core.Application.DTOs.Ciudadanos;
+using eVote360.Core.Application.DTOs.Ciudadanos;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
 using eVote360.Core.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using System.Text;
 using eVote360.WebApp.ViewModels.Elector;
 
 
@@ -18,6 +19,10 @@ namespace eVote360.WebApp.Controllers
         private readonly IGenericRepository<Ciudadano> _ciudadanoRepository;
         private readonly IGenericRepository<Eleccion> _eleccionRepository;
         private readonly IEmailService _emailService;
+        private readonly IGenericRepository<PartidoPolitico> _partidoRepository;
+        private readonly IGenericRepository<Candidato> _candidatoRepository;
+        private readonly IGenericRepository<PuestoElectivo> _puestoRepository;
+        private readonly IVotoRepository _votoRepository;
 
         public ElectorController(
                     IElectorService electorService,
@@ -25,7 +30,11 @@ namespace eVote360.WebApp.Controllers
                     IOtpService otpService,
                     IGenericRepository<Ciudadano> ciudadanoRepository,
                     IGenericRepository<Eleccion> eleccionRepository,
-                    IEmailService emailService)
+                    IEmailService emailService,
+                    IGenericRepository<PartidoPolitico> partidoRepository,
+                    IGenericRepository<Candidato> candidatoRepository,
+                    IGenericRepository<PuestoElectivo> puestoRepository,
+                    IVotoRepository votoRepository)
         {
             _electorService = electorService;
             _ocrService = ocrService;
@@ -33,6 +42,10 @@ namespace eVote360.WebApp.Controllers
             _ciudadanoRepository = ciudadanoRepository;
             _eleccionRepository = eleccionRepository;
             _emailService = emailService;
+            _partidoRepository = partidoRepository;
+            _candidatoRepository = candidatoRepository;
+            _puestoRepository = puestoRepository;
+            _votoRepository = votoRepository;
         }
 
         [HttpGet]
@@ -205,18 +218,58 @@ namespace eVote360.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> CabinaVotacion()
         {
+            if (TempData["CiudadanoId"] == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            int ciudadanoId = (int)TempData["CiudadanoId"];
+            TempData.Keep("CiudadanoId");
+
             var elecciones = await _eleccionRepository.GetAllAsync();
             var eleccionActiva = elecciones.FirstOrDefault(e => e.Estado == EstadoEleccion.Activa);
-
             if (eleccionActiva == null)
             {
                 return RedirectToAction("Index");
             }
 
+            var puestosDb = await _puestoRepository.GetAllAsync();
+            var puestosActivos = puestosDb.Where(p => p.Estado).ToList();
+
+            var partidosDb = await _partidoRepository.GetAllAsync();
+            var partidosActivos = partidosDb.Where(p => p.Estado).ToDictionary(p => p.Id);
+
+            var candidatosDb = await _candidatoRepository.GetAllAsync();
+            var candidatosActivos = candidatosDb.Where(c => c.EsActivo).ToList();
+
+            var votos = await _votoRepository.GetByCiudadanoEleccionAsync(ciudadanoId, eleccionActiva.Id);
+            var votosDict = votos.ToDictionary(v => v.PuestoElectivoId);
+
             var viewModel = new CabinaVotacionViewModel
             {
                 EleccionId = eleccionActiva.Id,
-                NombreEleccion = eleccionActiva.Nombre
+                NombreEleccion = eleccionActiva.Nombre,
+                Puestos = puestosActivos.Select(p => {
+                    votosDict.TryGetValue(p.Id, out var voto);
+                    return new PuestoVotacionDto
+                    {
+                        PuestoId = p.Id,
+                        NombrePuesto = p.Nombre,
+                        CandidatoSeleccionadoId = (voto != null && voto.CandidatoId.HasValue) ? voto.CandidatoId : null,
+                        SeleccionadoNinguno = voto != null && !voto.CandidatoId.HasValue,
+                        Candidatos = candidatosActivos
+                            .Where(c => c.PuestoElectivoId == p.Id && partidosActivos.ContainsKey(c.PartidoPoliticoId))
+                            .Select(c => new CandidatoVotacionDto
+                            {
+                                Id = c.Id,
+                                Nombre = c.Nombre,
+                                Apellido = c.Apellido,
+                                Foto = c.Foto,
+                                NombrePartido = partidosActivos[c.PartidoPoliticoId].Nombre,
+                                SiglasPartido = partidosActivos[c.PartidoPoliticoId].Siglas
+                            }).ToList()
+                    };
+                }).ToList()
             };
 
             return View(viewModel);
@@ -226,15 +279,23 @@ namespace eVote360.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegistrarVoto(int candidatoId, int puestoId, int eleccionId)
         {
-            int ciudadanoId = (int)TempData["CiudadanoId"]; // Asegura tener el ID del ciudadano[cite: 1]
+            if (TempData["CiudadanoId"] == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            int ciudadanoId = (int)TempData["CiudadanoId"];
+            TempData.Keep("CiudadanoId");
+
             await _electorService.RegistrarVotoAsync(candidatoId, puestoId, eleccionId, ciudadanoId);
             return RedirectToAction("CabinaVotacion");
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FinalizarVotacion(int eleccionId)
         {
-            // Verificamos por seguridad que el ID del ciudadano siga en sesión
+
             if (TempData["CiudadanoId"] == null)
             {
                 return RedirectToAction("Index");
@@ -242,35 +303,62 @@ namespace eVote360.WebApp.Controllers
 
             int ciudadanoId = (int)TempData["CiudadanoId"];
 
-            // Validar que cada puesto tenga una selección antes de finalizar[cite: 1]
+
             var resultado = await _electorService.ValidarFinalizacionAsync(ciudadanoId, eleccionId);
 
             if (!resultado.EsValido)
             {
-                TempData.Keep(); // Mantenemos la sesión activa
+                TempData.Keep();
                 ModelState.AddModelError(string.Empty, "Debe completar su selección para los siguientes puestos: " + resultado.PuestosFaltantes);
                 return RedirectToAction("CabinaVotacion");
             }
 
-            // 1. Guardamos el voto
+
             await _electorService.MarcarComoVotadoAsync(ciudadanoId, eleccionId);
 
-            // 2. Preparamos y enviamos el correo de resumen
+
             var ciudadano = await _ciudadanoRepository.GetByIdAsync(ciudadanoId);
             var eleccion = await _eleccionRepository.GetByIdAsync(eleccionId);
 
             if (ciudadano != null && eleccion != null && !string.IsNullOrWhiteSpace(ciudadano.CorreoElectronico))
             {
+                var votos = await _votoRepository.GetByCiudadanoEleccionAsync(ciudadanoId, eleccionId);
+                var sbVotos = new StringBuilder();
+
+                foreach (var v in votos)
+                {
+                    var puesto = await _puestoRepository.GetByIdAsync(v.PuestoElectivoId);
+                    string seleccion = "Ninguno (Voto en blanco)";
+
+                    if (v.CandidatoId.HasValue)
+                    {
+                        var cand = await _candidatoRepository.GetByIdAsync(v.CandidatoId.Value);
+                        seleccion = $"{cand.Nombre} {cand.Apellido}";
+                    }
+
+                    sbVotos.Append($"<li style='margin-bottom: 8px;'><strong>{puesto.Nombre}</strong>: {seleccion}</li>");
+                }
+
                 string correoDestino = ciudadano.CorreoElectronico;
-                string asunto = "Resumen de su participación electoral";
+                string asunto = "eVote360 Pro - Comprobante de Resumen Electoral";
+                string cuerpoHtml = $@"
+                    <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: 0 auto; color: #333;'>
+                        <h2 style='color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 10px; text-align: center;'>Comprobante de Votación</h2>
+                        <p>Estimado(a) <strong>{ciudadano.Nombre} {ciudadano.Apellido}</strong>,</p>
+                        <p>Le confirmamos que su participación en el proceso electoral <strong>{eleccion.Nombre}</strong> ha concluido correctamente.</p>
+                        <p>A continuación se detalla su selección por cada puesto electivo:</p>
+                        <ul style='font-size: 16px; line-height: 1.6; padding-left: 20px;'>
+                            {sbVotos}
+                        </ul>
+                        <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 25px; font-size: 12px; color: #666; border-left: 4px solid #0d6efd;'>
+                            Este correo sirve como constancia digital de su participación. Su voto ha sido registrado de forma segura y secreta en nuestra base de datos.
+                        </div>
+                    </div>";
 
-                // Estructura base inicial (luego puedes integrar esta data en tu vista Razor .cshtml o maquetar el string con formato para el correo/PDF)
-                string cuerpoResumen = $"Hola {ciudadano.Nombre},\n\nSu proceso de votación en {eleccion.Nombre} ha sido completado correctamente.\n\nGracias por ejercer su derecho al voto.";
-
-                await _emailService.EnviarResumenVotacionAsync(correoDestino, asunto, cuerpoResumen);
+                await _emailService.EnviarResumenVotacionAsync(correoDestino, asunto, cuerpoHtml);
             }
 
-            return RedirectToAction("Gracias");
+            return RedirectToAction("VotoConfirmado");
         }
 
         [HttpGet]

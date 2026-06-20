@@ -6,20 +6,29 @@ namespace eVote360.WebApp.ViewModels.Ciudadanos
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [Required(ErrorMessage = "El nombre es requerido.")]
         [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres.")]
+        [Display(Name = "Nombre")]
         public string Nombre { get; set; } = null!;
 
-        [Required(ErrorMessage = "El apellido es obligatorio.")]
+        [Required(ErrorMessage = "El apellido es requerido.")]
         [StringLength(50, ErrorMessage = "El apellido no puede exceder los 50 caracteres.")]
+        [Display(Name = "Apellido")]
         public string Apellido { get; set; } = null!;
 
-        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
-        [EmailAddress(ErrorMessage = "Debe introducir una dirección de correo válida.")]
+        [Required(ErrorMessage = "El correo electrónico es requerido.")]
+        [EmailAddress(ErrorMessage = "Debe ingresar un correo electrónico válido.")]
+        [Display(Name = "Correo electrónico")]
         public string CorreoElectronico { get; set; } = null!;
 
-        [Required(ErrorMessage = "El documento de identidad (Cédula) es obligatorio.")]
-        [RegularExpression(@"^\d{3}-?\d{7}-?\d{1}$", ErrorMessage = "El formato de la cédula debe ser 000-0000000-0.")]
+        [Required(ErrorMessage = "El número de documento de identidad es requerido.")]
+        [Display(Name = "Número de documento de identidad")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "El número de documento de identidad solo debe contener dígitos.")]
         public string DocumentoIdentidad { get; set; } = null!;
+
+        [Display(Name = "Activo")]
+        public bool Estado { get; set; } = true;
+
+        public bool PuedeEditarDocumentoIdentidad { get; set; } = true;
     }
 }

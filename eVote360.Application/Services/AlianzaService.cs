@@ -1,4 +1,4 @@
-﻿using eVote360.Core.Application.DTOs.Alianzas;
+using eVote360.Core.Application.DTOs.Alianzas;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
@@ -140,8 +140,12 @@ namespace eVote360.Core.Application.Services
             return solicitudes.Select(s => new SolicitudAlianzaDto
             {
                 Id = s.Id,
+                PartidoSolicitanteId = s.PartidoSolicitanteId,
+                PartidoReceptorId = s.PartidoReceptorId,
                 NombrePartidoSolicitante = s.PartidoSolicitante.Nombre,
                 SiglasPartidoSolicitante = s.PartidoSolicitante.Siglas,
+                NombrePartidoReceptor = s.PartidoReceptor.Nombre,
+                SiglasPartidoReceptor = s.PartidoReceptor.Siglas,
                 FechaSolicitud = s.FechaSolicitud,
                 Estado = s.Estado
             });
@@ -153,8 +157,12 @@ namespace eVote360.Core.Application.Services
             return alianzas.Select(s => new SolicitudAlianzaDto
             {
                 Id = s.Id,
+                PartidoSolicitanteId = s.PartidoSolicitanteId,
+                PartidoReceptorId = s.PartidoReceptorId,
                 NombrePartidoSolicitante = s.PartidoSolicitante.Nombre,
+                SiglasPartidoSolicitante = s.PartidoSolicitante.Siglas,
                 NombrePartidoReceptor = s.PartidoReceptor.Nombre,
+                SiglasPartidoReceptor = s.PartidoReceptor.Siglas,
                 FechaSolicitud = s.FechaSolicitud,
                 Estado = s.Estado
             });

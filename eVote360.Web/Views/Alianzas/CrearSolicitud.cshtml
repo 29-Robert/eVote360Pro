@@ -1,0 +1,50 @@
+@model eVote360.WebApp.ViewModels.Alianzas.CrearSolicitudAlianzaViewModel
+
+@{
+    ViewData["Title"] = "Proponer Alianza Política";
+}
+
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0 text-center"><i class="bi bi-shield-plus me-2"></i>Proponer Nueva Alianza</h4>
+        </div>
+        <div class="card-body p-4 bg-light">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-action="CrearSolicitud" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-4">
+                    <label asp-for="PartidoReceptorId" class="form-label fw-bold">Seleccionar Partido Aliado</label>
+                    <select asp-for="PartidoReceptorId" asp-items="Model.PartidosDisponibles" class="form-select">
+                        <option value="">-- Seleccione un Partido Político --</option>
+                    </select>
+                    <span asp-validation-for="PartidoReceptorId" class="text-danger"></span>
+                    <div class="form-text mt-2 small text-muted">
+                        <i class="bi bi-info-circle me-1"></i> Solo se muestran los partidos activos con los que no tienes una alianza vigente o solicitud en espera.
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-50">
+                        <i class="bi bi-send-fill me-1"></i> Enviar Propuesta
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary w-50">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

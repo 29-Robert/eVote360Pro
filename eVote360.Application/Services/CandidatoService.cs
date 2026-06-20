@@ -1,4 +1,4 @@
-﻿using eVote360.Core.Application.DTOs.Candidato;
+using eVote360.Core.Application.DTOs.Candidato;
 using eVote360.Core.Application.Interfaces.Repositories;
 using eVote360.Core.Application.Interfaces.Services;
 using eVote360.Core.Domain.Entities;
@@ -30,11 +30,11 @@ namespace eVote360.Core.Application.Services
             {
                 Nombre = dto.Nombre,
                 Apellido = dto.Apellido,
-                DocumentoIdentidad = dto.DocumentoIdentidad,
+                DocumentoIdentidad = System.Text.RegularExpressions.Regex.Replace(dto.DocumentoIdentidad, @"[^\d]", ""),
                 CorreoElectronico = dto.CorreoElectronico,
                 PartidoPoliticoId = dto.PartidoPoliticoId,
                 PuestoElectivoId = dto.PuestoElectivoId,
-                Foto = dto.Foto ?? "/images/default.png", // Ruta estándar
+                Foto = dto.Foto ?? "/images/default.png",
                 EsActivo = true
             };
             await _candidatoRepo.AddAsync(entity);
@@ -47,7 +47,7 @@ namespace eVote360.Core.Application.Services
             var entity = await _candidatoRepo.GetByIdAsync(dto.Id);
             entity.Nombre = dto.Nombre;
             entity.Apellido = dto.Apellido;
-            entity.DocumentoIdentidad = dto.DocumentoIdentidad;
+            entity.DocumentoIdentidad = System.Text.RegularExpressions.Regex.Replace(dto.DocumentoIdentidad, @"[^\d]", "");
             entity.CorreoElectronico = dto.CorreoElectronico;
             entity.PartidoPoliticoId = dto.PartidoPoliticoId;
             entity.PuestoElectivoId = dto.PuestoElectivoId;
@@ -69,7 +69,11 @@ namespace eVote360.Core.Application.Services
                 Foto = c.Foto,
                 EsActivo = c.EsActivo,
                 NombrePartido = c.PartidoPolitico.Nombre,
-                PuestoAsignado = c.PuestoElectivo?.Nombre ?? "Sin puesto asociado"
+                PuestoAsignado = c.PuestoElectivo?.Nombre ?? "Sin puesto asociado",
+                DocumentoIdentidad = c.DocumentoIdentidad,
+                CorreoElectronico = c.CorreoElectronico,
+                PartidoPoliticoId = c.PartidoPoliticoId,
+                PuestoElectivoId = c.PuestoElectivoId
             };
         }
 

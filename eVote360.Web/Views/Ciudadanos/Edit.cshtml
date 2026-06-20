@@ -1,0 +1,97 @@
+@model eVote360.WebApp.ViewModels.Ciudadanos.SaveCiudadanoViewModel
+
+@{
+    ViewData["Title"] = "Editar ciudadano";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="m-0"><i class="bi bi-pencil-square me-2"></i>Editar ciudadano</h4>
+                </div>
+                <div class="card-body bg-light">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    @if (!Model.PuedeEditarDocumentoIdentidad)
+                    {
+                        <div class="alert alert-warning border-start border-warning border-4 py-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            No se puede modificar el número de documento de identidad de este ciudadano porque ya participó en una elección.
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="PuedeEditarDocumentoIdentidad" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Nombre" class="form-label fw-bold"></label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Apellido" class="form-label fw-bold"></label>
+                                <input asp-for="Apellido" class="form-control" />
+                                <span asp-validation-for="Apellido" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CorreoElectronico" class="form-label fw-bold"></label>
+                                <input asp-for="CorreoElectronico" class="form-control" />
+                                <span asp-validation-for="CorreoElectronico" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DocumentoIdentidad" class="form-label fw-bold"></label>
+                                @if (Model.PuedeEditarDocumentoIdentidad)
+                                {
+                                    <input asp-for="DocumentoIdentidad"
+                                           class="form-control"
+                                           maxlength="20"
+                                           inputmode="numeric"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                                }
+                                else
+                                {
+                                    <input asp-for="DocumentoIdentidad" class="form-control" readonly />
+                                }
+                                <span asp-validation-for="DocumentoIdentidad" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input asp-for="Estado" class="form-check-input" role="switch" />
+                                    <label asp-for="Estado" class="form-check-label fw-bold">Ciudadano activo</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">Volver atrás</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var input = document.getElementById("DocumentoIdentidad");
+            if (input) {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            }
+        });
+    </script>
+}

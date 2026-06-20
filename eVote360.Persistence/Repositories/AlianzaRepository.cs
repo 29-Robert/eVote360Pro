@@ -51,7 +51,7 @@ namespace eVote360.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<PartidoPoliticoDto>> GetPartidosDisponiblesAsync(int partidoId)
         {
-            // Partidos con alianza vigente o solicitud pendiente
+
             var noDisponibles = await _context.SolicitudesAlianzas
                 .Where(s => (s.PartidoSolicitanteId == partidoId || s.PartidoReceptorId == partidoId)
                          && (s.Estado == EstadoSolicitudAlianza.Aceptada || s.Estado == EstadoSolicitudAlianza.EnEspera))

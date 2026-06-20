@@ -18,7 +18,7 @@ namespace eVote360.Core.Application.DTOs.Candidato
         [Required(ErrorMessage = "El apellido es obligatorio")]
         public new string Apellido { get; set; } = string.Empty;
 
-        // Si la foto es obligatoria por validación, no debería ser string?
+
         [Required(ErrorMessage = "La foto es obligatoria")]
         public new string Foto { get; set; } = string.Empty;
 

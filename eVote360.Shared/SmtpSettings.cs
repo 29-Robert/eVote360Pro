@@ -1,4 +1,4 @@
-﻿namespace eVote360.Shared.Settings; // Ajusta el namespace según tus carpetas
+﻿namespace eVote360.Shared.Settings;
 
 public class SmtpSettings
 {

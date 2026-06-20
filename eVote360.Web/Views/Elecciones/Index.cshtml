@@ -1,4 +1,4 @@
-﻿@model IEnumerable<eVote360.Core.Domain.Entities.Eleccion>
+@model IEnumerable<eVote360.Core.Domain.Entities.Eleccion>
 @using eVote360.Core.Domain.Enums
 
 @{
@@ -96,8 +96,11 @@
                                             }
                                             @if (eleccion.Estado == EstadoEleccion.Finalizada)
                                             {
+                                                <a asp-controller="Resultados" asp-action="Escrutinio" asp-route-eleccionId="@eleccion.Id" class="btn btn-sm btn-outline-info me-1">
+                                                    <i class="bi bi-eye-fill me-1"></i> Resultados
+                                                </a>
                                                 <button class="btn btn-sm btn-light text-muted" disabled>
-                                                    <i class="bi bi-lock-fill"></i> Proceso Concluido
+                                                    <i class="bi bi-lock-fill"></i> Concluido
                                                 </button>
                                             }
                                         </div>

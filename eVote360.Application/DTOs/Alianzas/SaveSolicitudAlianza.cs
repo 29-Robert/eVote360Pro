@@ -13,7 +13,7 @@ namespace eVote360.Core.Application.DTOs.Alianzas
     [Required(ErrorMessage = "El partido receptor es obligatorio")]
     public int PartidoReceptorId { get; set; }
 
-    public int PartidoSolicitanteId { get; set; } // se toma del dirigente logueado
+    public int PartidoSolicitanteId { get; set; }
 
     public EstadoSolicitudAlianza Estado { get; set; } = EstadoSolicitudAlianza.EnEspera;
 
